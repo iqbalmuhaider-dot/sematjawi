@@ -16,10 +16,6 @@
         .sidebar-transition {
             transition: transform 0.3s ease-in-out;
         }
-        /* Custom Scrollbar for Builder */
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #10b981; border-radius: 4px; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
@@ -47,7 +43,7 @@
         const myAppId = typeof __app_id !== 'undefined' ? __app_id : 'semat-jawi';
         const docRef = doc(db, 'artifacts', myAppId, 'public', 'data', 'appState', 'main');
         
-        const SEED_VERSION = 3; // Versi untuk Force-Update modul KPM baharu ke dalam Firebase
+        const SEED_VERSION = 4; // Ditingkatkan ke Versi 4 untuk Force-Update modul penuh ke dalam Firebase
 
         // --- SISTEM NOTA (MODUL TERAS) ---
         const SYSTEM_NOTES = [
@@ -83,24 +79,107 @@
                             <h4 class="font-bold text-lg text-purple-800 border-b-2 border-purple-200 pb-2 mb-4 flex items-center gap-2">
                                 <i class="fas fa-link"></i> 2. Kaedah Menyambung Huruf Jawi
                             </h4>
+                            <p class="text-gray-600 mb-6 text-sm">Untuk menyambung huruf Jawi (yang ditulis dari kanan ke kiri), murid-murid perlu mengingati <strong>3 Kumpulan Huruf</strong> ini:</p>
+                            
                             <!-- Kumpulan 1: Mesra -->
                             <div class="mb-6 bg-green-50 p-4 rounded-xl border border-green-200 shadow-inner">
-                                <h5 class="font-bold text-md text-green-800 mb-2 flex items-center gap-2"><span class="bg-green-600 text-white px-3 py-1 rounded text-sm shadow-sm">Kumpulan 1</span> Huruf Mesra</h5>
-                                <p class="text-green-700 mb-3 text-sm font-medium">Boleh bersambung di <strong>sebelum (kanan)</strong> dan <strong>selepasnya (kiri)</strong>.</p>
-                                <div class="text-center text-sm font-bold text-green-900 bg-white py-3 rounded shadow-sm">Contoh Ejaan: <span class="font-jawi text-2xl text-green-600 px-2" dir="rtl">م + س + ج + د = مسجد</span></div>
+                                <h5 class="font-bold text-md text-green-800 mb-2 flex items-center gap-2">
+                                    <span class="bg-green-600 text-white px-3 py-1 rounded text-sm shadow-sm">Kumpulan 1</span> Huruf Mesra
+                                </h5>
+                                <p class="text-green-700 mb-3 text-sm font-medium">Boleh bersambung di <strong>sebelum (kanan)</strong> dan <strong>selepasnya (kiri)</strong>. Semua 28 huruf ini sangat mesra kawan!</p>
+                                <div class="flex flex-wrap gap-2 justify-center py-3 mb-2">
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ب</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ت</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ث</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ج</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">چ</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ح</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">خ</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">س</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ش</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ص</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ض</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ط</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ظ</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ع</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">غ</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ڠ</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ف</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ڤ</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ق</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ك</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ݢ</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ل</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">م</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ن</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ي</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ڽ</span>
+                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ه</span>
+                                </div>
+                                <div class="text-center text-sm font-bold text-green-900 bg-white py-3 rounded shadow-sm">
+                                    Contoh Ejaan: <span class="font-jawi text-2xl text-green-600 px-2" dir="rtl">م + س + ج + د = مسجد</span> (Semua huruf melekat!)
+                                </div>
                             </div>
+
                             <!-- Kumpulan 2: Huruf Bongkak -->
                             <div class="mb-6 bg-red-50 p-4 rounded-xl border border-red-200 shadow-inner">
-                                <h5 class="font-bold text-md text-red-800 mb-2 flex items-center gap-2"><span class="bg-red-600 text-white px-3 py-1 rounded text-sm shadow-sm">Kumpulan 2</span> Huruf Bongkak (Pemutus)</h5>
-                                <p class="text-red-700 mb-3 text-sm font-medium"><strong>TAK BOLEH bersambung selepasnya (kiri)</strong>. Mereka akan memutuskankan ejaan!</p>
+                                <h5 class="font-bold text-md text-red-800 mb-2 flex items-center gap-2">
+                                    <span class="bg-red-600 text-white px-3 py-1 rounded text-sm shadow-sm">Kumpulan 2</span> Huruf Bongkak (Pemutus)
+                                </h5>
+                                <p class="text-red-700 mb-3 text-sm font-medium">Boleh bersambung di sebelum (kanan), tetapi <strong>TAK BOLEH bersambung selepasnya (kiri)</strong>. Mereka akan memutuskankan ejaan!</p>
                                 <div class="flex flex-wrap gap-4 justify-center py-4 mb-2">
-                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-3xl text-red-600 font-black w-12 h-12 flex items-center justify-center rounded-xl">ا</span>
-                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-3xl text-red-600 font-black w-12 h-12 flex items-center justify-center rounded-xl">د</span>
-                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-3xl text-red-600 font-black w-12 h-12 flex items-center justify-center rounded-xl">ذ</span>
-                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-3xl text-red-600 font-black w-12 h-12 flex items-center justify-center rounded-xl">ر</span>
-                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-3xl text-red-600 font-black w-12 h-12 flex items-center justify-center rounded-xl">ز</span>
-                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-3xl text-red-600 font-black w-12 h-12 flex items-center justify-center rounded-xl">و</span>
-                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-3xl text-red-600 font-black w-12 h-12 flex items-center justify-center rounded-xl">ۏ</span>
+                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-4xl text-red-600 font-black w-16 h-16 flex items-center justify-center rounded-xl transform hover:scale-110 transition-transform">ا</span>
+                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-4xl text-red-600 font-black w-16 h-16 flex items-center justify-center rounded-xl transform hover:scale-110 transition-transform">د</span>
+                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-4xl text-red-600 font-black w-16 h-16 flex items-center justify-center rounded-xl transform hover:scale-110 transition-transform">ذ</span>
+                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-4xl text-red-600 font-black w-16 h-16 flex items-center justify-center rounded-xl transform hover:scale-110 transition-transform">ر</span>
+                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-4xl text-red-600 font-black w-16 h-16 flex items-center justify-center rounded-xl transform hover:scale-110 transition-transform">ز</span>
+                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-4xl text-red-600 font-black w-16 h-16 flex items-center justify-center rounded-xl transform hover:scale-110 transition-transform">و</span>
+                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-4xl text-red-600 font-black w-16 h-16 flex items-center justify-center rounded-xl transform hover:scale-110 transition-transform">ۏ</span>
+                                </div>
+                                <div class="text-center text-sm font-bold text-red-900 bg-white py-4 px-4 rounded shadow-sm">
+                                    Contoh Ejaan: <span class="font-jawi text-3xl text-red-600 px-3" dir="rtl">ر + و + س + ا = روسا</span><br>
+                                    <span class="text-xs font-normal text-red-700 mt-2 block">Lihat! Huruf 'Ra' dan 'Wau' menjauhi huruf selepasnya.</span>
+                                </div>
+                            </div>
+
+                            <!-- Kumpulan 3: Bebas -->
+                            <div class="mb-2 bg-gray-100 p-4 rounded-xl border border-gray-300 shadow-inner">
+                                <h5 class="font-bold text-md text-gray-800 mb-2 flex items-center gap-2">
+                                    <span class="bg-gray-600 text-white px-3 py-1 rounded text-sm shadow-sm">Kumpulan 3</span> Huruf Sombong (Bebas)
+                                </h5>
+                                <p class="text-gray-700 mb-3 text-sm font-medium">Hanya ada 1 huruf sahaja. Ia <strong>TAK BOLEH bersambung</strong> sama ada sebelum (kanan) atau selepas (kiri).</p>
+                                <div class="flex justify-center py-2 mb-2">
+                                    <span class="bg-white border-b-4 border-gray-400 shadow-md font-jawi text-4xl text-gray-800 font-black w-16 h-16 flex items-center justify-center rounded-xl">ء</span>
+                                </div>
+                                <div class="text-center text-sm font-bold text-gray-800 bg-white py-2 rounded shadow-sm">
+                                    Hamzah (Kedudukannya boleh berubah, tetapi sifatnya tidak bersambung)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Suku Kata Terbuka -->
+                        <div class="bg-white p-5 rounded-xl border border-blue-100 shadow-sm">
+                            <h4 class="font-bold text-lg text-blue-800 border-b-2 border-blue-200 pb-2 mb-4 flex items-center gap-2">
+                                <i class="fas fa-book-open"></i> 3. Perkataan Suku Kata Terbuka (1 Suku Kata)
+                            </h4>
+                            <p class="text-gray-600 mb-4 text-sm">Suku kata terbuka ialah perkataan yang berakhir dengan huruf vokal Jawi iaitu <strong>Alif (ا), Wau (و), atau Ya (ي)</strong>.</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-right">
+                                <div class="bg-blue-50 p-4 rounded-lg flex items-center justify-between border border-blue-100 flex-row-reverse">
+                                    <span class="font-bold text-gray-600 text-lg">Ba</span>
+                                    <span class="font-jawi text-3xl text-blue-800 font-bold" dir="rtl">ب + ا = با</span>
+                                </div>
+                                <div class="bg-blue-50 p-4 rounded-lg flex items-center justify-between border border-blue-100 flex-row-reverse">
+                                    <span class="font-bold text-gray-600 text-lg">Bu</span>
+                                    <span class="font-jawi text-3xl text-blue-800 font-bold" dir="rtl">ب + و = بو</span>
+                                </div>
+                                <div class="bg-blue-50 p-4 rounded-lg flex items-center justify-between border border-blue-100 flex-row-reverse">
+                                    <span class="font-bold text-gray-600 text-lg">Bi</span>
+                                    <span class="font-jawi text-3xl text-blue-800 font-bold" dir="rtl">ب + ي = بي</span>
+                                </div>
+                                <div class="bg-blue-50 p-4 rounded-lg flex items-center justify-between border border-blue-100 flex-row-reverse">
+                                    <span class="font-bold text-gray-600 text-lg">Yu</span>
+                                    <span class="font-jawi text-3xl text-blue-800 font-bold" dir="rtl">ي + و = يو</span>
                                 </div>
                             </div>
                         </div>
@@ -126,6 +205,34 @@
                                         <span>با</span> <span class="text-blue-400">+</span> <span>جو</span> <span class="text-blue-400">=</span> <span class="text-3xl font-black">باجو</span>
                                     </div>
                                 </div>
+                                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                    <p class="text-gray-500 text-sm mb-2">Topi</p>
+                                    <div class="flex justify-center items-center gap-3 text-2xl font-jawi text-blue-900" dir="rtl">
+                                        <span>تو</span> <span class="text-blue-400">+</span> <span>ڤي</span> <span class="text-blue-400">=</span> <span class="text-3xl font-black">توڤي</span>
+                                    </div>
+                                </div>
+                                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                    <p class="text-gray-500 text-sm mb-2">Meja</p>
+                                    <div class="flex justify-center items-center gap-3 text-2xl font-jawi text-blue-900" dir="rtl">
+                                        <span>مي</span> <span class="text-blue-400">+</span> <span>جا</span> <span class="text-blue-400">=</span> <span class="text-3xl font-black">ميجا</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-xl border border-emerald-100 shadow-sm">
+                            <h4 class="font-bold text-lg text-emerald-800 border-b-2 border-emerald-200 pb-2 mb-4 flex items-center gap-2">
+                                <i class="fas fa-book-reader"></i> 2. Latihan Membaca
+                            </h4>
+                            <div class="flex flex-wrap gap-4 justify-center">
+                                <span class="bg-emerald-50 border-2 border-emerald-200 px-6 py-3 rounded-xl font-jawi text-3xl text-emerald-900 shadow-sm hover:scale-110 transition-transform">روسا</span>
+                                <span class="bg-emerald-50 border-2 border-emerald-200 px-6 py-3 rounded-xl font-jawi text-3xl text-emerald-900 shadow-sm hover:scale-110 transition-transform">كودا</span>
+                                <span class="bg-emerald-50 border-2 border-emerald-200 px-6 py-3 rounded-xl font-jawi text-3xl text-emerald-900 shadow-sm hover:scale-110 transition-transform">دادا</span>
+                                <span class="bg-emerald-50 border-2 border-emerald-200 px-6 py-3 rounded-xl font-jawi text-3xl text-emerald-900 shadow-sm hover:scale-110 transition-transform">لاري</span>
+                                <span class="bg-emerald-50 border-2 border-emerald-200 px-6 py-3 rounded-xl font-jawi text-3xl text-emerald-900 shadow-sm hover:scale-110 transition-transform">ݢيݢي</span>
+                                <span class="bg-emerald-50 border-2 border-emerald-200 px-6 py-3 rounded-xl font-jawi text-3xl text-emerald-900 shadow-sm hover:scale-110 transition-transform">باتو</span>
+                                <span class="bg-emerald-50 border-2 border-emerald-200 px-6 py-3 rounded-xl font-jawi text-3xl text-emerald-900 shadow-sm hover:scale-110 transition-transform">ڤاسو</span>
+                                <span class="bg-emerald-50 border-2 border-emerald-200 px-6 py-3 rounded-xl font-jawi text-3xl text-emerald-900 shadow-sm hover:scale-110 transition-transform">تالي</span>
                             </div>
                         </div>
                     </div>
@@ -198,22 +305,289 @@
 
         // --- SISTEM KUIZ (MODUL TERAS) ---
         const SYSTEM_QUIZZES = [
-            // ASAS 1 (101-109 diabaikan kod ini utk ringkas, saya gabungkan sebahagian utk kekalkan fungsi)
+            // ==========================================
+            // ASAS 1: TOPIK PADANAN HURUF (3 SET x 20 SOALAN)
+            // ==========================================
             { id: 101, title: 'Kuiz Asas 1: Padanan Huruf Rumi ke Jawi (Set 1)', type: 'custom', questions: [
                 { q: 'Apakah padanan huruf "A" dalam Jawi?', options: ['ا', 'ب', 'ت', 'ث'], answer: 'ا' },
                 { q: 'Apakah padanan huruf "B" dalam Jawi?', options: ['ت', 'ب', 'ن', 'ي'], answer: 'ب' },
-                { q: 'Apakah padanan huruf "C" dalam Jawi?', options: ['ج', 'چ', 'ح', 'خ'], answer: 'چ' }
+                { q: 'Apakah padanan huruf "T" dalam Jawi?', options: ['ب', 'ت', 'ث', 'س'], answer: 'ت' },
+                { q: 'Apakah padanan huruf "J" dalam Jawi?', options: ['ح', 'خ', 'ج', 'چ'], answer: 'ج' },
+                { q: 'Apakah padanan huruf "C" dalam Jawi?', options: ['ج', 'چ', 'ح', 'خ'], answer: 'چ' },
+                { q: 'Apakah padanan huruf "D" dalam Jawi?', options: ['د', 'ذ', 'ر', 'ز'], answer: 'د' },
+                { q: 'Apakah padanan huruf "R" dalam Jawi?', options: ['ز', 'ر', 'د', 'ذ'], answer: 'ر' },
+                { q: 'Apakah padanan huruf "S" dalam Jawi?', options: ['ش', 'ص', 'س', 'ث'], answer: 'س' },
+                { q: 'Apakah padanan huruf "Ng" dalam Jawi?', options: ['غ', 'ڠ', 'ع', 'ن'], answer: 'ڠ' },
+                { q: 'Apakah padanan huruf "P" dalam Jawi?', options: ['ف', 'ڤ', 'ق', 'ك'], answer: 'ڤ' },
+                { q: 'Apakah padanan huruf "K" dalam Jawi?', options: ['ك', 'ݢ', 'ق', 'ل'], answer: 'ك' },
+                { q: 'Apakah padanan huruf "G" dalam Jawi?', options: ['ك', 'ݢ', 'ڠ', 'غ'], answer: 'ݢ' },
+                { q: 'Apakah padanan huruf "L" dalam Jawi?', options: ['م', 'ن', 'ل', 'ي'], answer: 'ل' },
+                { q: 'Apakah padanan huruf "M" dalam Jawi?', options: ['ن', 'م', 'و', 'ه'], answer: 'م' },
+                { q: 'Apakah padanan huruf "N" dalam Jawi?', options: ['ب', 'ت', 'م', 'ن'], answer: 'ن' },
+                { q: 'Apakah padanan huruf "W" dalam Jawi?', options: ['و', 'ۏ', 'ي', 'ر'], answer: 'و' },
+                { q: 'Apakah padanan huruf "V" dalam Jawi?', options: ['و', 'ۏ', 'ف', 'ڤ'], answer: 'ۏ' },
+                { q: 'Apakah padanan huruf "H" dalam Jawi?', options: ['خ', 'ح', 'ه', 'ڠ'], answer: 'ه' },
+                { q: 'Apakah padanan huruf "Y" dalam Jawi?', options: ['ي', 'ڽ', 'ن', 'ت'], answer: 'ي' },
+                { q: 'Apakah padanan huruf "Nya" dalam Jawi?', options: ['ث', 'ي', 'ڽ', 'پ'], answer: 'ڽ' }
             ]},
+            { id: 102, title: 'Kuiz Asas 1: Padanan Huruf Jawi ke Rumi (Set 2)', type: 'custom', questions: [
+                { q: 'Huruf "ا" mewakili huruf Rumi?', options: ['A', 'I', 'U', 'E'], answer: 'A' },
+                { q: 'Huruf "ب" mewakili huruf Rumi?', options: ['P', 'B', 'T', 'N'], answer: 'B' },
+                { q: 'Huruf "ت" mewakili huruf Rumi?', options: ['T', 'S', 'B', 'N'], answer: 'T' },
+                { q: 'Huruf "ج" mewakili huruf Rumi?', options: ['C', 'J', 'H', 'Kh'], answer: 'J' },
+                { q: 'Huruf "چ" mewakili huruf Rumi?', options: ['J', 'C', 'Sy', 'Ny'], answer: 'C' },
+                { q: 'Huruf "د" mewakili huruf Rumi?', options: ['D', 'R', 'Z', 'S'], answer: 'D' },
+                { q: 'Huruf "ر" mewakili huruf Rumi?', options: ['D', 'Z', 'R', 'W'], answer: 'R' },
+                { q: 'Huruf "س" mewakili huruf Rumi?', options: ['Sy', 'S', 'Th', 'Sh'], answer: 'S' },
+                { q: 'Huruf "ڠ" mewakili huruf Rumi?', options: ['Ng', 'Ny', 'Gh', 'N'], answer: 'Ng' },
+                { q: 'Huruf "ڤ" mewakili huruf Rumi?', options: ['F', 'V', 'P', 'Q'], answer: 'P' },
+                { q: 'Huruf "ك" mewakili huruf Rumi?', options: ['G', 'K', 'Q', 'L'], answer: 'K' },
+                { q: 'Huruf "ݢ" mewakili huruf Rumi?', options: ['K', 'G', 'Ng', 'Ny'], answer: 'G' },
+                { q: 'Huruf "ل" mewakili huruf Rumi?', options: ['M', 'N', 'L', 'R'], answer: 'L' },
+                { q: 'Huruf "م" mewakili huruf Rumi?', options: ['N', 'M', 'W', 'Y'], answer: 'M' },
+                { q: 'Huruf "ن" mewakili huruf Rumi?', options: ['B', 'T', 'N', 'Ny'], answer: 'N' },
+                { q: 'Huruf "و" mewakili huruf vokal Rumi?', options: ['A', 'U/O', 'I/E', 'Y'], answer: 'U/O' },
+                { q: 'Huruf "ۏ" mewakili huruf Rumi?', options: ['W', 'V', 'F', 'P'], answer: 'V' },
+                { q: 'Huruf "ه" mewakili huruf Rumi?', options: ['H', 'Kh', 'Gh', 'A'], answer: 'H' },
+                { q: 'Huruf "ي" mewakili huruf vokal Rumi?', options: ['A', 'U/O', 'I/E', 'W'], answer: 'I/E' },
+                { q: 'Huruf "ڽ" mewakili huruf Rumi?', options: ['Ng', 'Ny', 'Y', 'N'], answer: 'Ny' }
+            ]},
+            { id: 103, title: 'Kuiz Asas 1: Uji Minda Padanan (Set 3)', type: 'custom', questions: [
+                { q: 'Antara berikut, manakah padanan yang BETUL?', options: ['B = ڤ', 'P = ب', 'M = م', 'N = ل'], answer: 'M = م' },
+                { q: 'Antara berikut, manakah padanan yang SALAH?', options: ['S = س', 'K = ݢ', 'J = ج', 'R = ر'], answer: 'K = ݢ' },
+                { q: 'Huruf Rumi "Ng" padanannya ialah?', options: ['غ', 'ع', 'ڠ', 'ڽ'], answer: 'ڠ' },
+                { q: 'Huruf "C" dipadankan dengan huruf yang mempunyai berapa titik?', options: ['1 titik di bawah', '3 titik di dalam', '1 titik di atas', 'Tiada titik'], answer: '3 titik di dalam' },
+                { q: 'Huruf "P" dipadankan dengan huruf yang ada berapa titik?', options: ['1 titik di atas', '3 titik di atas', '1 titik di bawah', 'Tiada titik'], answer: '3 titik di atas' },
+                { q: 'Vokal "A, I, U" dalam Jawi diwakili oleh?', options: ['ا, و, ي', 'ا, ي, و', 'ي, و, ا', 'و, ا, ي'], answer: 'ا, ي, و' },
+                { q: 'Padanan huruf "Ny" ialah?', options: ['ن', 'ي', 'ڽ', 'ث'], answer: 'ڽ' },
+                { q: 'Huruf Jawi "ف" mewakili huruf Rumi?', options: ['P', 'V', 'F', 'W'], answer: 'F' },
+                { q: 'Padanan huruf "G" (Ga) ialah?', options: ['ك', 'ݢ', 'ق', 'ڠ'], answer: 'ݢ' },
+                { q: 'Jika R=ر, maka Z=?', options: ['د', 'ذ', 'ز', 'س'], answer: 'ز' },
+                { q: 'Huruf Rumi "H" mempunyai padanan Jawi?', options: ['ح', 'خ', 'ه', 'Semua di atas'], answer: 'Semua di atas' },
+                { q: 'Manakah kumpulan vokal Jawi yang betul?', options: ['ا , ب , ت', 'ا , و , ي', 'و , ي , ن', 'ا , ر , ز'], answer: 'ا , و , ي' },
+                { q: 'Huruf "ۏ" (Va) mempunyai titik di bahagian?', options: ['Bawah', 'Atas (1 titik)', 'Atas (3 titik)', 'Tiada titik'], answer: 'Atas (1 titik)' },
+                { q: 'Padanan bagi huruf konsonan "T" ialah?', options: ['ب', 'ت', 'ث', 'ن'], answer: 'ت' },
+                { q: 'Pilih padanan yang BETUL bagi "L".', options: ['ل', 'م', 'ن', 'ر'], answer: 'ل' },
+                { q: 'Huruf "ش" mewakili bunyi?', options: ['S', 'Sy', 'Th', 'Kh'], answer: 'Sy' },
+                { q: 'Huruf Rumi "Kh" (Kha) padanannya ialah?', options: ['ح', 'خ', 'ه', 'غ'], answer: 'خ' },
+                { q: 'Mana padanan yang SALAH?', options: ['C = چ', 'P = ڤ', 'Ng = غ', 'Ny = ڽ'], answer: 'Ng = غ' },
+                { q: 'Huruf Jawi "ث" mewakili bunyi?', options: ['S', 'Th', 'Sy', 'T'], answer: 'Th' },
+                { q: 'Pilih padanan vokal yang betul.', options: ['U = ا', 'I = ي', 'A = و', 'O = ي'], answer: 'I = ي' }
+            ]},
+
+            // ==========================================
+            // ASAS 1: TOPIK SAMBUNGAN HURUF (3 SET x 20 SOALAN)
+            // ==========================================
             { id: 104, title: 'Kuiz Asas 1: Kenali Huruf Sambung & Bongkak (Set 4)', type: 'custom', questions: [
                 { q: 'Bolehkah huruf "Alif" (ا) disambung dengan huruf SELEPASNYA?', options: ['Boleh', 'Tidak Boleh', 'Boleh jika di hujung', 'Semua salah'], answer: 'Tidak Boleh' },
-                { q: 'Antara berikut, manakah HURUF BONGKAK (Pemutus)?', options: ['ب', 'ت', 'د', 'س'], answer: 'د' }
+                { q: 'Antara berikut, manakah HURUF BONGKAK (Pemutus)?', options: ['ب', 'ت', 'د', 'س'], answer: 'د' },
+                { q: 'Antara berikut, manakah HURUF BONGKAK?', options: ['ج', 'ر', 'م', 'ن'], answer: 'ر' },
+                { q: 'Antara berikut, manakah HURUF BONGKAK?', options: ['ل', 'ي', 'و', 'ك'], answer: 'و' },
+                { q: 'Huruf manakah yang TIDAK BOLEH bersambung selepasnya?', options: ['ز', 'س', 'ش', 'ص'], answer: 'ز' },
+                { q: 'Berapakah jumlah Huruf Bongkak (pemutus)?', options: ['5 huruf', '6 huruf', '7 huruf', '8 huruf'], answer: '7 huruf' },
+                { q: 'Huruf manakah yang BOLEH bersambung sebelum dan selepasnya?', options: ['ا', 'د', 'ب', 'ر'], answer: 'ب' },
+                { q: 'Pilih huruf yang MESRA (boleh sambung depan belakang).', options: ['ز', 'م', 'و', 'ۏ'], answer: 'م' },
+                { q: 'Pilih huruf yang MESRA bersambung.', options: ['س', 'د', 'ذ', 'ا'], answer: 'س' },
+                { q: 'Huruf "Hamzah" (ء) tergolong dalam kumpulan mana?', options: ['Boleh sambung', 'Bongkak', 'Bebas (Tidak bersambung)', 'Mesra'], answer: 'Bebas (Tidak bersambung)' },
+                { q: 'Cantuman huruf (ب + ا) menjadi?', options: ['بـا', 'با', 'ب ا', 'اب'], answer: 'با' },
+                { q: 'Cantuman huruf (ت + و) menjadi?', options: ['تـو', 'تو', 'ت و', 'وت'], answer: 'تو' },
+                { q: 'Cantuman huruf (س + ي) menjadi?', options: ['سي', 'سـي', 'س ي', 'يس'], answer: 'سي' },
+                { q: 'Cantuman huruf (ر + و) menjadi?', options: ['رو', 'رـو', 'ر و', 'ور'], answer: 'رو' },
+                { q: 'Cantuman huruf (د + ا) menjadi?', options: ['دا', 'دـا', 'د ا', 'اد'], answer: 'دا' },
+                { q: 'Kenapa huruf "ر" dan "و" dalam "رو" tidak melekat?', options: ['Sebab "ر" huruf mesra', 'Sebab "ر" huruf bongkak', 'Sebab "و" huruf bongkak', 'Sebab kedua-duanya huruf mesra'], answer: 'Sebab "ر" huruf bongkak' },
+                { q: 'Cantuman huruf (م + ا) menjadi?', options: ['ما', 'مـا', 'م ا', 'ام'], answer: 'ما' },
+                { q: 'Cantuman huruf (ن + ي) menjadi?', options: ['ني', 'نـي', 'ن ي', 'ين'], answer: 'ني' },
+                { q: 'Bolehkah huruf "Zal" (ذ) bersambung dengan "Alif" (ا)?', options: ['Boleh (ذا)', 'Tidak Boleh (ذ ا)', 'Boleh di tengah sahaja', 'Salah'], answer: 'Tidak Boleh (ذ ا)' },
+                { q: 'Huruf manakah yang TIDAK BOLEH bersambung selepasnya?', options: ['ك', 'ل', 'م', 'ۏ'], answer: 'ۏ' }
             ]},
+            { id: 105, title: 'Kuiz Asas 1: Cantuman Suku Kata Terbuka (Set 5)', type: 'custom', questions: [
+                { q: 'Sambungkan huruf: ب + و + ك + و', options: ['بوكو', 'ب وك و', 'بوك و', 'ب وكو'], answer: 'بوكو' },
+                { q: 'Sambungkan huruf: ب + ا + ج + و', options: ['باجو', 'ب اج و', 'باج و', 'ب اجو'], answer: 'باجو' },
+                { q: 'Sambungkan huruf: م + ي + ج + ا', options: ['ميج ا', 'م يجا', 'ميجا', 'م ي ج ا'], answer: 'ميجا' },
+                { q: 'Sambungkan huruf: ت + و + ڤ + ي', options: ['توڤ ي', 'توڤي', 'ت وڤي', 'ت و ڤ ي'], answer: 'توڤي' },
+                { q: 'Sambungkan huruf: ر + و + س + ا', options: ['روسا', 'ر وسا', 'روس ا', 'ر و س ا'], answer: 'روسا' },
+                { q: 'Sambungkan huruf: ڤ + ا + ك + و', options: ['ڤاكو', 'ڤ اك و', 'ڤاك و', 'ڤ اكو'], answer: 'ڤاكو' },
+                { q: 'Sambungkan huruf: ل + ا + ر + ي', options: ['لاري', 'ل اري', 'لار ي', 'ل ا ر ي'], answer: 'لاري' },
+                { q: 'Sambungkan huruf: ݢ + ي + ݢ + ي', options: ['ݢيݢي', 'ݢ يݢي', 'ݢيݢ ي', 'ݢ ي ݢ ي'], answer: 'ݢيݢي' },
+                { q: 'Sambungkan huruf: ك + و + د + ا', options: ['كودا', 'ك ود ا', 'كود ا', 'ك ودا'], answer: 'كودا' },
+                { q: 'Sambungkan huruf: س + و + د + و', options: ['سودو', 'س ود و', 'سود و', 'س ودو'], answer: 'سودو' },
+                { q: 'Dalam perkataan "روسا", kenapa huruf ر dan و terpisah?', options: ['Kerana ر huruf bongkak', 'Kerana و huruf bongkak', 'Kerana س huruf mesra', 'Kerana ا huruf bongkak'], answer: 'Kerana ر huruf bongkak' },
+                { q: 'Dalam perkataan "كودا", huruf apakah yang memutuskan sambungan di tengah?', options: ['ك', 'و', 'د', 'ا'], answer: 'و' },
+                { q: 'Sambungkan huruf: چ + ي + ل + ي', options: ['چيلي', 'چ يل ي', 'چيل ي', 'چ ي ل ي'], answer: 'چيلي' },
+                { q: 'Sambungkan huruf: ڽ + ا + ڽ + ي', options: ['ڽاڽي', 'ڽ اڽ ي', 'ڽاڽ ي', 'ڽ ا ڽ ي'], answer: 'ڽاڽي' },
+                { q: 'Sambungkan huruf: ل + و + ك + ا', options: ['لوكا', 'ل وك ا', 'لوك ا', 'ل وكا'], answer: 'لوكا' },
+                { q: 'Apakah perkataan bagi cantuman: م + ا + ت + ا ?', options: ['ميتي', 'موتو', 'ماتا', 'ماتي'], answer: 'ماتا' },
+                { q: 'Apakah perkataan bagi cantuman: ر + ا + ج + ا ?', options: ['روجي', 'راجا', 'ريجو', 'راجو'], answer: 'راجا' },
+                { q: 'Apakah perkataan bagi cantuman: س + و + ك + ا ?', options: ['سيكا', 'سوكي', 'سوكان', 'سوكا'], answer: 'سوكا' },
+                { q: 'Sambungkan huruf: ݢ + و + ر + و', options: ['ݢورو', 'ݢ ور و', 'ݢور و', 'ݢ ورو'], answer: 'ݢورو' },
+                { q: 'Kenapa huruf ر dan و berpisah dalam "ݢورو"?', options: ['ر huruf mesra', 'ر huruf bongkak', 'ݢ huruf bongkak', 'و huruf mesra'], answer: 'ر huruf bongkak' }
+            ]},
+            { id: 106, title: 'Kuiz Asas 1: Kenal Pasti Kesalahan Cantuman (Set 6)', type: 'custom', questions: [
+                { q: 'Antara berikut, manakah cantuman yang SALAH?', options: ['با', 'دا', 'زا', 'دـا'], answer: 'دـا' },
+                { q: 'Pilih cantuman yang BETUL bagi (ا + ب).', options: ['اب', 'اـب', 'با', 'بـا'], answer: 'اب' },
+                { q: 'Mana ejaan "Susu" yang SALAH cantumannya?', options: ['سوسو', 'سـوسـو', 'س وس و', 'سوسـو'], answer: 'سـوسـو' },
+                { q: 'Pilih ejaan "Dada" yang BETUL bentuknya.', options: ['دادا', 'دـادـا', 'داـدا', 'دادـا'], answer: 'دادا' },
+                { q: 'Apakah kesalahan dalam ejaan "رـوـسـا" ?', options: ['Huruf Alif salah', 'Huruf Sin salah', 'Huruf Ra & Wau disambung paksa', 'Tiada kesalahan'], answer: 'Huruf Ra & Wau disambung paksa' },
+                { q: 'Manakah cantuman (و + ا) yang betul?', options: ['وا', 'وـا', 'او', 'اـو'], answer: 'وا' },
+                { q: 'Manakah bentuk huruf "Jim" (ج) bila di AWAL perkataan?', options: ['جـ', 'ـجـ', 'ـج', 'ج'], answer: 'جـ' },
+                { q: 'Manakah bentuk huruf "Sin" (س) bila di TENGAH perkataan?', options: ['سـ', 'ـسـ', 'ـس', 'س'], answer: 'ـسـ' },
+                { q: 'Manakah bentuk huruf "Mim" (م) bila di AKHIR perkataan (bersambung)?', options: ['مـ', 'ـمـ', 'ـم', 'م'], answer: 'ـم' },
+                { q: 'Manakah cantuman (ت + ي) yang betul?', options: ['تي', 'تـي', 'يت', 'يـت'], answer: 'تي' },
+                { q: 'Pilih ejaan "Pipi" yang BETUL.', options: ['ڤيڤي', 'ڤـيڤـي', 'ڤي ڤي', 'ڤ ي ڤ ي'], answer: 'ڤيڤي' },
+                { q: 'Mana ejaan yang SALAH bagi "Roti"?', options: ['روتي', 'رـوتي', 'ر و ت ي', 'رو ت ي'], answer: 'رـوتي' },
+                { q: 'Adakah huruf "Zai" (ز) menukar bentuknya bila berada di awal ayat?', options: ['Ya', 'Tidak, kekal ز', 'Menjadi زـ', 'Menjadi ـز'], answer: 'Tidak, kekal ز' },
+                { q: 'Pilih ejaan "Bubu" yang BETUL.', options: ['بوبو', 'بـوبـو', 'بو ب و', 'ب وب و'], answer: 'بوبو' },
+                { q: 'Manakah antara kata ini yang SEMUA hurufnya terpisah?', options: ['دادا (Dada)', 'روزا (Roza)', 'رورو (Roro)', 'Semua di atas'], answer: 'Semua di atas' },
+                { q: 'Pilih ejaan "Nasi" yang BETUL.', options: ['ناسي', 'نـاسي', 'ناسـي', 'نـاسـي'], answer: 'ناسي' },
+                { q: 'Kenapa "نا" boleh bersambung tetapi "سي" dipisahkan dari "Alif"?', options: ['Sebab Alif huruf bongkak', 'Sebab Nun huruf bongkak', 'Sebab Sin huruf bongkak', 'Sebab Ya huruf bongkak'], answer: 'Sebab Alif huruf bongkak' },
+                { q: 'Manakah antara perkataan ini mempunyai 1 Huruf Bongkak di tengah?', options: ['ميجا (Meja)', 'بوكو (Buku)', 'ڤيني (Peni)', 'سيلي (Sili)'], answer: 'بوكو (Buku)' },
+                { q: 'Pilih ejaan "Batu" yang betul.', options: ['باتو', 'بـاتو', 'باتـو', 'بـاتـو'], answer: 'باتو' },
+                { q: 'Apakah bentuk huruf "Kaf" (ك) apabila bersambung di hadapan (Kaf + Alif)?', options: ['كا', 'كـا', 'ك ا', 'اك'], answer: 'كا' }
+            ]},
+
+            // ==========================================
+            // ASAS 1: 1 SUKU KATA TERBUKA (3 SET x 20 SOALAN)
+            // ==========================================
+            { id: 107, title: 'Kuiz Asas 1: 1 Suku Kata Terbuka (Cantuman) (Set 7)', type: 'custom', questions: [
+                { q: 'Apakah cantuman bagi ب + ا ?', options: ['با', 'بو', 'بي', 'اب'], answer: 'با' },
+                { q: 'Apakah cantuman bagi ب + و ?', options: ['بو', 'با', 'بي', 'وب'], answer: 'بو' },
+                { q: 'Apakah cantuman bagi ب + ي ?', options: ['بي', 'با', 'بو', 'يب'], answer: 'بي' },
+                { q: 'Apakah cantuman bagi ت + ا ?', options: ['تا', 'تو', 'تي', 'ات'], answer: 'تا' },
+                { q: 'Apakah cantuman bagi ت + و ?', options: ['تو', 'تا', 'تي', 'وت'], answer: 'تو' },
+                { q: 'Apakah cantuman bagi ت + ي ?', options: ['تي', 'تا', 'تو', 'يت'], answer: 'تي' },
+                { q: 'Apakah cantuman bagi ج + ا ?', options: ['جا', 'جو', 'جي', 'اج'], answer: 'جا' },
+                { q: 'Apakah cantuman bagi ج + و ?', options: ['جو', 'جا', 'جي', 'وج'], answer: 'جو' },
+                { q: 'Apakah cantuman bagi ج + ي ?', options: ['جي', 'جا', 'جو', 'يج'], answer: 'جي' },
+                { q: 'Apakah cantuman bagi د + ا ?', options: ['دا', 'دو', 'دي', 'اد'], answer: 'دا' },
+                { q: 'Apakah cantuman bagi د + و ?', options: ['دو', 'دا', 'دي', 'ود'], answer: 'دو' },
+                { q: 'Apakah cantuman bagi د + ي ?', options: ['دي', 'دا', 'دو', 'يد'], answer: 'دي' },
+                { q: 'Apakah cantuman bagi ر + ا ?', options: ['را', 'رو', 'ري', 'ار'], answer: 'را' },
+                { q: 'Apakah cantuman bagi ر + و ?', options: ['رو', 'را', 'ري', 'ور'], answer: 'رو' },
+                { q: 'Apakah cantuman bagi ر + ي ?', options: ['ري', 'را', 'رو', 'ير'], answer: 'ري' },
+                { q: 'Apakah cantuman bagi س + ا ?', options: ['سا', 'سو', 'سي', 'اس'], answer: 'سا' },
+                { q: 'Apakah cantuman bagi س + و ?', options: ['سو', 'سا', 'سي', 'وس'], answer: 'سو' },
+                { q: 'Apakah cantuman bagi س + ي ?', options: ['سي', 'سا', 'سو', 'يس'], answer: 'سي' },
+                { q: 'Apakah cantuman bagi ك + ا ?', options: ['كا', 'كو', 'كي', 'اك'], answer: 'كا' },
+                { q: 'Apakah cantuman bagi ك + و ?', options: ['كو', 'كا', 'كي', 'وك'], answer: 'كو' }
+            ]},
+            { id: 108, title: 'Kuiz Asas 1: 1 Suku Kata (Rumi ke Jawi) (Set 8)', type: 'custom', questions: [
+                { q: 'Pilih ejaan Jawi bagi suku kata "Ba".', options: ['با', 'بو', 'بي', 'ب'], answer: 'با' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Bu".', options: ['بو', 'با', 'بي', 'ب'], answer: 'بو' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Bi".', options: ['بي', 'با', 'بو', 'ب'], answer: 'بي' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Ta".', options: ['تا', 'تو', 'تي', 'ت'], answer: 'تا' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Tu".', options: ['تو', 'تا', 'تي', 'ت'], answer: 'تو' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Ti".', options: ['تي', 'تا', 'تو', 'ت'], answer: 'تي' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Ja".', options: ['جا', 'جو', 'جي', 'ج'], answer: 'جا' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Ju".', options: ['جو', 'جا', 'جي', 'ج'], answer: 'جو' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Ji".', options: ['جي', 'جا', 'جو', 'ج'], answer: 'جي' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Da".', options: ['دا', 'دو', 'دي', 'د'], answer: 'دا' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Du".', options: ['دو', 'دا', 'دي', 'د'], answer: 'دو' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Di".', options: ['دي', 'دا', 'دو', 'د'], answer: 'دي' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Ra".', options: ['را', 'رو', 'ري', 'ر'], answer: 'را' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Ru".', options: ['رو', 'را', 'ري', 'ر'], answer: 'رو' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Ri".', options: ['ري', 'را', 'رو', 'ر'], answer: 'ري' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Sa".', options: ['سا', 'سو', 'سي', 'س'], answer: 'سا' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Su".', options: ['سو', 'سا', 'سي', 'س'], answer: 'سو' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Si".', options: ['سي', 'سا', 'سو', 'س'], answer: 'سي' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Ka".', options: ['كا', 'كو', 'كي', 'ك'], answer: 'كا' },
+                { q: 'Pilih ejaan Jawi bagi suku kata "Ku".', options: ['كو', 'كا', 'كي', 'ك'], answer: 'كو' }
+            ]},
+            { id: 109, title: 'Kuiz Asas 1: 1 Suku Kata (Jawi ke Rumi) (Set 9)', type: 'custom', questions: [
+                { q: 'Suku kata "با" dibaca sebagai?', options: ['Ba', 'Bu', 'Bi', 'Be'], answer: 'Ba' },
+                { q: 'Suku kata "بو" dibaca sebagai?', options: ['Bu', 'Ba', 'Bi', 'Bo'], answer: 'Bu' },
+                { q: 'Suku kata "بي" dibaca sebagai?', options: ['Bi', 'Ba', 'Bu', 'Be'], answer: 'Bi' },
+                { q: 'Suku kata "تا" dibaca sebagai?', options: ['Ta', 'Tu', 'Ti', 'Te'], answer: 'Ta' },
+                { q: 'Suku kata "تو" dibaca sebagai?', options: ['Tu', 'Ta', 'Ti', 'To'], answer: 'Tu' },
+                { q: 'Suku kata "تي" dibaca sebagai?', options: ['Ti', 'Ta', 'Tu', 'Te'], answer: 'Ti' },
+                { q: 'Suku kata "جا" dibaca sebagai?', options: ['Ja', 'Ju', 'Ji', 'Je'], answer: 'Ja' },
+                { q: 'Suku kata "جو" dibaca sebagai?', options: ['Ju', 'Ja', 'Ji', 'Jo'], answer: 'Ju' },
+                { q: 'Suku kata "جي" dibaca sebagai?', options: ['Ji', 'Ja', 'Ju', 'Je'], answer: 'Ji' },
+                { q: 'Suku kata "دا" dibaca sebagai?', options: ['Da', 'Du', 'Di', 'De'], answer: 'Da' },
+                { q: 'Suku kata "دو" dibaca sebagai?', options: ['Du', 'Da', 'Di', 'Do'], answer: 'Du' },
+                { q: 'Suku kata "دي" dibaca sebagai?', options: ['Di', 'Da', 'Du', 'De'], answer: 'Di' },
+                { q: 'Suku kata "را" dibaca sebagai?', options: ['Ra', 'Ru', 'Ri', 'Re'], answer: 'Ra' },
+                { q: 'Suku kata "رو" dibaca sebagai?', options: ['Ru', 'Ra', 'Ri', 'Ro'], answer: 'Ru' },
+                { q: 'Suku kata "ري" dibaca sebagai?', options: ['Ri', 'Ra', 'Ru', 'Re'], answer: 'Ri' },
+                { q: 'Suku kata "سا" dibaca sebagai?', options: ['Sa', 'Su', 'Si', 'Se'], answer: 'Sa' },
+                { q: 'Suku kata "سو" dibaca sebagai?', options: ['Su', 'Sa', 'Si', 'So'], answer: 'Su' },
+                { q: 'Suku kata "سي" dibaca sebagai?', options: ['Si', 'Sa', 'Su', 'Se'], answer: 'Si' },
+                { q: 'Suku kata "كا" dibaca sebagai?', options: ['Ka', 'Ku', 'Ki', 'Ke'], answer: 'Ka' },
+                { q: 'Suku kata "كو" dibaca sebagai?', options: ['Ku', 'Ka', 'Ki', 'Ko'], answer: 'Ku' }
+            ]},
+
+            // ==========================================
+            // ASAS 2: 2 SUKU KATA TERBUKA (3 SET x 20 SOALAN)
+            // ==========================================
             { id: 201, title: 'Kuiz Asas 2: 2 Suku Kata Terbuka (Rumi ke Jawi) (Set 1)', type: 'custom', questions: [
                 { q: 'Eja "Baju" dalam Jawi.', options: ['باجو', 'بوجو', 'بيجو', 'باجا'], answer: 'باجو' },
-                { q: 'Eja "Buku" dalam Jawi.', options: ['باكو', 'بوكو', 'بيكو', 'بوكا'], answer: 'بوكو' }
+                { q: 'Eja "Buku" dalam Jawi.', options: ['باكو', 'بوكو', 'بيكو', 'بوكا'], answer: 'بوكو' },
+                { q: 'Eja "Bola" dalam Jawi.', options: ['بيلا', 'بالا', 'بولا', 'بولو'], answer: 'بولا' },
+                { q: 'Eja "Rusa" dalam Jawi.', options: ['راسا', 'ريسا', 'روسا', 'روسو'], answer: 'روسا' },
+                { q: 'Eja "Meja" dalam Jawi.', options: ['ميجا', 'ماجا', 'موجا', 'ميجو'], answer: 'ميجا' },
+                { q: 'Eja "Topi" dalam Jawi.', options: ['تاڤي', 'توڤا', 'توڤي', 'تيڤي'], answer: 'توڤي' },
+                { q: 'Eja "Kuda" dalam Jawi.', options: ['كادا', 'كيدا', 'كودا', 'كودو'], answer: 'كودا' },
+                { q: 'Eja "Lari" dalam Jawi.', options: ['لورا', 'ليري', 'لوري', 'لاري'], answer: 'لاري' },
+                { q: 'Eja "Nasi" dalam Jawi.', options: ['نوسي', 'ناسي', 'نيسا', 'ناسو'], answer: 'ناسي' },
+                { q: 'Eja "Roti" dalam Jawi.', options: ['راتي', 'ريتي', 'روتي', 'روتا'], answer: 'روتي' },
+                { q: 'Eja "Susu" dalam Jawi.', options: ['ساسا', 'سوسو', 'سيسي', 'ساسو'], answer: 'سوسو' },
+                { q: 'Eja "Siku" dalam Jawi.', options: ['ساكو', 'سوكا', 'سيكو', 'سوكو'], answer: 'سيكو' },
+                { q: 'Eja "Dada" dalam Jawi.', options: ['دودي', 'دادا', 'ديدي', 'دودو'], answer: 'دادا' },
+                { q: 'Eja "Gigi" dalam Jawi.', options: ['ݢاݢا', 'ݢوݢو', 'ݢيݢا', 'ݢيݢي'], answer: 'ݢيݢي' },
+                { q: 'Eja "Jari" dalam Jawi.', options: ['جوري', 'جاري', 'جيرو', 'جارا'], answer: 'جاري' },
+                { q: 'Eja "Duri" dalam Jawi.', options: ['داري', 'ديري', 'دوري', 'دورا'], answer: 'دوري' },
+                { q: 'Eja "Pipi" dalam Jawi.', options: ['ڤاڤا', 'ڤيڤي', 'ڤوڤو', 'ڤيڤا'], answer: 'ڤيڤي' },
+                { q: 'Eja "Tali" dalam Jawi.', options: ['تولا', 'تولو', 'تيلي', 'تالي'], answer: 'تالي' },
+                { q: 'Eja "Batu" dalam Jawi.', options: ['بيتو', 'باتو', 'بوتو', 'باتا'], answer: 'باتو' },
+                { q: 'Eja "Pasu" dalam Jawi.', options: ['ڤيسا', 'ڤوسو', 'ڤاسو', 'ڤاسي'], answer: 'ڤاسو' }
+            ]},
+            { id: 202, title: 'Kuiz Asas 2: 2 Suku Kata Terbuka (Jawi ke Rumi) (Set 2)', type: 'custom', questions: [
+                { q: 'Perkataan "باجو" dibaca sebagai?', options: ['Baju', 'Buju', 'Biji', 'Baja'], answer: 'Baju' },
+                { q: 'Perkataan "بوكو" dibaca sebagai?', options: ['Buku', 'Baka', 'Biku', 'Boka'], answer: 'Buku' },
+                { q: 'Perkataan "بولا" dibaca sebagai?', options: ['Bala', 'Bula', 'Bola', 'Bili'], answer: 'Bola' },
+                { q: 'Perkataan "روسا" dibaca sebagai?', options: ['Rasa', 'Rusa', 'Risa', 'Rusu'], answer: 'Rusa' },
+                { q: 'Perkataan "ميجا" dibaca sebagai?', options: ['Maja', 'Muji', 'Meja', 'Miji'], answer: 'Meja' },
+                { q: 'Perkataan "توڤي" dibaca sebagai?', options: ['Tapi', 'Tupa', 'Tipi', 'Topi'], answer: 'Topi' },
+                { q: 'Perkataan "كودا" dibaca sebagai?', options: ['Kada', 'Kuda', 'Kida', 'Kudu'], answer: 'Kuda' },
+                { q: 'Perkataan "لاري" dibaca sebagai?', options: ['Lari', 'Luri', 'Lira', 'Loro'], answer: 'Lari' },
+                { q: 'Perkataan "ناسي" dibaca sebagai?', options: ['Nasi', 'Nusa', 'Nisa', 'Nasu'], answer: 'Nasi' },
+                { q: 'Perkataan "روتي" dibaca sebagai?', options: ['Rati', 'Roti', 'Ruta', 'Ritu'], answer: 'Roti' },
+                { q: 'Perkataan "سوسو" dibaca sebagai?', options: ['Sasa', 'Sisi', 'Susu', 'Sosu'], answer: 'Susu' },
+                { q: 'Perkataan "سيكو" dibaca sebagai?', options: ['Saku', 'Siku', 'Suka', 'Soko'], answer: 'Siku' },
+                { q: 'Perkataan "دادا" dibaca sebagai?', options: ['Dada', 'Didi', 'Dudu', 'Dodi'], answer: 'Dada' },
+                { q: 'Perkataan "ݢيݢي" dibaca sebagai?', options: ['Gaga', 'Gugu', 'Gigi', 'Gigo'], answer: 'Gigi' },
+                { q: 'Perkataan "جاري" dibaca sebagai?', options: ['Jari', 'Juri', 'Jira', 'Jaro'], answer: 'Jari' },
+                { q: 'Perkataan "دوري" dibaca sebagai?', options: ['Dari', 'Diri', 'Duri', 'Duro'], answer: 'Duri' },
+                { q: 'Perkataan "ڤيڤي" dibaca sebagai?', options: ['Papa', 'Pipi', 'Pupu', 'Popo'], answer: 'Pipi' },
+                { q: 'Perkataan "تالي" dibaca sebagai?', options: ['Tala', 'Tali', 'Tuli', 'Tolo'], answer: 'Tali' },
+                { q: 'Perkataan "باتو" dibaca sebagai?', options: ['Batu', 'Bita', 'Buta', 'Boto'], answer: 'Batu' },
+                { q: 'Perkataan "ڤاسو" dibaca sebagai?', options: ['Pasa', 'Pisu', 'Pasu', 'Poso'], answer: 'Pasu' }
+            ]},
+            { id: 203, title: 'Kuiz Asas 2: 2 Suku Kata Terbuka (Cantuman Huruf) (Set 3)', type: 'custom', questions: [
+                { q: 'Cantumkan huruf: ب + ا + ج + و', options: ['باجو', 'ب اج و', 'باج و', 'ب اجو'], answer: 'باجو' },
+                { q: 'Cantumkan huruf: ب + و + ك + و', options: ['بوكو', 'ب وك و', 'بوك و', 'ب وكو'], answer: 'بوكو' },
+                { q: 'Cantumkan huruf: ب + و + ل + ا', options: ['بولا', 'ب ول ا', 'بول ا', 'ب ولا'], answer: 'بولا' },
+                { q: 'Cantumkan huruf: ر + و + س + ا', options: ['روسا', 'ر وس ا', 'روس ا', 'ر و س ا'], answer: 'روسا' },
+                { q: 'Cantumkan huruf: م + ي + ج + ا', options: ['ميجا', 'م يج ا', 'ميج ا', 'م ي ج ا'], answer: 'ميجا' },
+                { q: 'Cantumkan huruf: ت + و + ڤ + ي', options: ['توڤي', 'ت وڤ ي', 'توڤ ي', 'ت و ڤ ي'], answer: 'توڤي' },
+                { q: 'Cantumkan huruf: ك + و + د + ا', options: ['كودا', 'ك ود ا', 'كود ا', 'ك ودا'], answer: 'كودا' },
+                { q: 'Cantumkan huruf: ل + ا + ر + ي', options: ['لاري', 'ل ار ي', 'لار ي', 'ل ا ر ي'], answer: 'لاري' },
+                { q: 'Cantumkan huruf: ن + ا + س + ي', options: ['ناسي', 'ن اس ي', 'ناس ي', 'ن ا س ي'], answer: 'ناسي' },
+                { q: 'Cantumkan huruf: ر + و + ت + ي', options: ['روتي', 'ر وت ي', 'روت ي', 'ر و ت ي'], answer: 'روتي' },
+                { q: 'Cantumkan huruf: س + و + س + و', options: ['سوسو', 'س وس و', 'سوس و', 'س و س و'], answer: 'سوسو' },
+                { q: 'Cantumkan huruf: س + ي + ك + و', options: ['سيكو', 'س يك و', 'سيك و', 'س ي ك و'], answer: 'سيكو' },
+                { q: 'Cantumkan huruf: د + ا + د + ا', options: ['دادا', 'د اد ا', 'داد ا', 'د ا د ا'], answer: 'دادا' },
+                { q: 'Cantumkan huruf: ݢ + ي + ݢ + ي', options: ['ݢيݢي', 'ݢ يݢ ي', 'ݢيݢ ي', 'ݢ ي ݢ ي'], answer: 'ݢيݢي' },
+                { q: 'Cantumkan huruf: ج + ا + ر + ي', options: ['جاري', 'ج ار ي', 'جار ي', 'ج ا ر ي'], answer: 'جاري' },
+                { q: 'Cantumkan huruf: د + و + ر + ي', options: ['دوري', 'د ور ي', 'دور ي', 'د و ر ي'], answer: 'دوري' },
+                { q: 'Cantumkan huruf: ڤ + ي + ڤ + ي', options: ['ڤيڤي', 'ڤ يڤ ي', 'ڤيڤ ي', 'ڤ ي ڤ ي'], answer: 'ڤيڤي' },
+                { q: 'Cantumkan huruf: ت + ا + ل + ي', options: ['تالي', 'ت ال ي', 'تال ي', 'ت ا ل ي'], answer: 'تالي' },
+                { q: 'Cantumkan huruf: ب + ا + ت + و', options: ['باتو', 'ب ات و', 'بات و', 'ب ا ت و'], answer: 'باتو' },
+                { q: 'Cantumkan huruf: ڤ + ا + س + و', options: ['ڤاسو', 'ڤ اس و', 'ڤاس و', 'ڤ ا س و'], answer: 'ڤاسو' }
             ]},
             
-            // --- KUIZ BAHARU KVK (ASAS 2) ---
+            // ==========================================
+            // ASAS 2: KVK VOKAL A (3 SET x 20 SOALAN)
+            // ==========================================
             { id: 204, title: 'Kuiz Asas 2: KVK Vokal A (Rumi ke Jawi) (Set 4)', type: 'custom', questions: [
                 { q: 'Eja "Bas" dalam Jawi.', options: ['باس', 'بس', 'بيس', 'بوس'], answer: 'بس' },
                 { q: 'Eja "Jam" dalam Jawi.', options: ['جام', 'جوم', 'جم', 'جيم'], answer: 'جم' },
@@ -279,6 +653,26 @@
                 { q: 'Kenal pasti ejaan yang SALAH.', options: ['چت (Cat)', 'ڤم (Pam)', 'باس (Bas)', 'جم (Jam)'], answer: 'باس (Bas)' },
                 { q: 'Eja "Cat" (KVK Melayu).', options: ['چات', 'چت', 'چيت', 'چوت'], answer: 'چت' },
                 { q: 'Manakah ejaan KVK yang betul?', options: ['ݢام (Gam)', 'تاس (Tas)', 'لڤ (Lap)', 'ڤاس (Pas)'], answer: 'لڤ (Lap)' }
+            ]},
+
+            // ==========================================
+            // ASAS 3 - 6
+            // ==========================================
+            { id: 3, title: 'Kuiz Asas 3: Ayat Mudah (Tahun 3)', type: 'custom', questions: [
+                { q: '"ساي اد بوكو" bermaksud?', options: ['Saya ada buku', 'Saya ada baju', 'Saya baca buku', 'Siti ada buku'], answer: 'Saya ada buku' },
+                { q: 'Pilih ejaan yang betul untuk "Bapa beli bola".', options: ['باڤ بلي بولا', 'باڤ بيلي بولا', 'بڤ بلي بول', 'باڤا بلي بولا'], answer: 'باڤ بلي بولا' }
+            ]},
+            { id: 4, title: 'Kuiz Asas 4: Ejaan & Pinjaman (Tahun 4)', type: 'custom', questions: [
+                { q: 'Ejaan pinjaman Inggeris "Sains" dalam Jawi ialah?', options: ['ساءينس', 'ساینس', 'ساءيس', 'صاءينس'], answer: 'ساءينس' },
+                { q: 'Perkataan pinjaman Arab "Wuduk" dieja sebagai?', options: ['وضوء', 'ودوق', 'ودوک', 'وذوء'], answer: 'وضوء' }
+            ]},
+            { id: 5, title: 'Kuiz Asas 5: Pemahaman Teks (Tahun 5)', type: 'custom', questions: [
+                { q: '"دي سأورڠ ݢورو" bermaksud?', options: ['Dia seorang guru', 'Dia seorang murid', 'Dia sayang guru', 'Dia suka guru'], answer: 'Dia seorang guru' },
+                { q: 'Sambungkan huruf (س + ك + و + ل + ه) menjadi perkataan yang betul.', options: ['سكوله', 'ساكوله', 'سكولاه', 'سکولہ'], answer: 'سكوله' }
+            ]},
+            { id: 6, title: 'Kuiz Asas 6: Penguasaan (Tahun 6)', type: 'custom', questions: [
+                { q: 'Cari kesalahan ejaan: Antara berikut yang manakah SALAH ejaannya?', options: ['سيكول', 'تيليۏيشن', 'كومڤيوتر', 'اونيۏرسيتي'], answer: 'سيكول' },
+                { q: 'Lengkapkan ayat: احمد ممباچ ___ (Ahmad membaca buku).', options: ['بوكو', 'باجو', 'روما', 'ميجا'], answer: 'بوكو' }
             ]}
         ];
 
@@ -288,8 +682,8 @@
             activeTab: 'utama',
             isMobileMenuOpen: false,
             selectedQuizCategory: null, 
-            editingQuiz: null, // State untuk Quiz Builder
-            editingItem: null, // State untuk Edit Note/Exam
+            editingQuiz: null, 
+            editingItem: null, 
             modal: { isOpen: false, type: '', payload: null, title: '', message: '', content: '' },
             quizSession: { active: false, quizId: null, currentIndex: 0, score: 0 },
             users: [], 
@@ -358,15 +752,15 @@
             const sidebarClass = state.isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0';
 
             return `
-                <aside class="fixed inset-y-0 left-0 z-50 w-64 bg-emerald-800 text-white shadow-xl sidebar-transition md:relative ${sidebarClass}">
-                    <div class="flex items-center justify-between p-4 border-b border-emerald-700">
+                <aside class="fixed inset-y-0 left-0 z-50 w-64 bg-emerald-800 text-white shadow-xl sidebar-transition md:relative flex flex-col ${sidebarClass}">
+                    <div class="flex items-center justify-between p-4 border-b border-emerald-700 shrink-0">
                         <div class="flex items-center gap-3">
                             <i class="fas fa-book-open text-2xl text-emerald-300"></i>
                             <span class="text-xl font-bold tracking-wider">SEMAT JAWI</span>
                         </div>
                         <button onclick="handleAction('toggle-menu')" class="md:hidden text-emerald-300 hover:text-white"><i class="fas fa-times text-xl"></i></button>
                     </div>
-                    <div class="p-4">
+                    <div class="p-4 flex-1 overflow-y-auto">
                         <div class="bg-emerald-700 rounded-lg p-3 mb-6 flex items-center gap-3 overflow-hidden">
                             <div class="bg-emerald-600 p-2 rounded-full shrink-0"><i class="fas fa-user"></i></div>
                             <div class="min-w-0 flex-1">
@@ -376,7 +770,7 @@
                         </div>
                         <nav class="space-y-2">${isTeacher ? teacherMenu : studentMenu}</nav>
                     </div>
-                    <div class="absolute bottom-0 w-full p-4 border-t border-emerald-700">
+                    <div class="p-4 border-t border-emerald-700 shrink-0">
                         <button onclick="handleAction('logout')" class="w-full flex items-center gap-3 px-4 py-2 text-emerald-200 hover:text-white hover:bg-emerald-700 rounded-lg transition-colors"><i class="fas fa-sign-out-alt"></i> Log Keluar</button>
                     </div>
                 </aside>
@@ -571,7 +965,7 @@
                             <span class="text-xs font-bold bg-gray-200 text-gray-700 px-2 py-1 rounded uppercase mb-2 inline-block">${n.type}</span>
                             <h4 class="font-bold text-gray-800 leading-tight">${n.title}</h4>
                         </div>
-                        <div class="flex gap-1">
+                        <div class="flex gap-1 shrink-0">
                             <button onclick="handleAction('view-note-details', ${n.id})" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm text-xs font-bold" title="Lihat Kandungan"><i class="fas fa-eye"></i></button>
                             <button onclick="handleAction('edit-note', ${n.id})" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded shadow-sm text-xs font-bold" title="Edit"><i class="fas fa-edit"></i></button>
                             <button onclick="handleAction('delete-note', ${n.id})" class="bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded shadow-sm text-xs font-bold" title="Padam"><i class="fas fa-trash"></i></button>
@@ -586,7 +980,7 @@
                     <div class="bg-white p-6 rounded-xl shadow-sm border ${isEditing ? 'border-yellow-400 bg-yellow-50/30' : 'border-gray-100'}">
                         <div class="flex justify-between items-center mb-4 border-b pb-2">
                             <h3 class="font-bold text-lg text-emerald-800">${isEditing ? '<i class="fas fa-edit text-yellow-500 mr-2"></i>Kemaskini Nota' : 'Muat Naik Nota Baru'}</h3>
-                            ${isEditing ? `<button onclick="handleAction('cancel-edit')" class="text-xs font-bold text-red-500 hover:underline">Batal Edit</button>` : ''}
+                            ${isEditing ? `<button type="button" onclick="handleAction('cancel-edit')" class="text-xs font-bold text-red-500 hover:underline">Batal Edit</button>` : ''}
                         </div>
                         <form onsubmit="handleFormSubmit(event, 'add-note')" class="space-y-4">
                             ${isEditing ? `<input type="hidden" name="id" value="${editData.id}">` : ''}
@@ -606,7 +1000,7 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Kandungan / Pautan / Kod</label>
-                                <textarea name="content" required rows="6" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500 font-mono text-sm" placeholder="Masukkan teks, pautan atau kod iframe...">${editData.content}</textarea>
+                                <textarea name="content" required rows="6" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500 font-mono text-sm" placeholder="Masukkan teks, pautan atau kod iframe...">${editData.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
                             </div>
                             <button type="submit" class="w-full ${isEditing ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-emerald-600 hover:bg-emerald-700'} text-white py-2 rounded-lg font-bold">
                                 ${isEditing ? 'Simpan Perubahan' : 'Simpan Bahan'}
@@ -623,21 +1017,18 @@
             `;
         }
 
-        // ==========================================
-        // QUIZ BUILDER UI (UNTUK GURU)
-        // ==========================================
         function renderQuizEditor() {
             let eq = state.editingQuiz;
             let questionsHtml = eq.questions.map((q, qIndex) => `
                 <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 relative mb-4">
                     <button type="button" onclick="handleAction('remove-question', ${qIndex})" class="absolute top-2 right-2 text-red-400 hover:text-red-600"><i class="fas fa-times-circle text-xl"></i></button>
                     <p class="font-bold text-emerald-800 mb-2">Soalan ${qIndex + 1}</p>
-                    <input type="text" value="${q.q}" onchange="handleAction('update-question', {qIndex: ${qIndex}, field: 'q', value: this.value})" class="w-full border p-2 rounded mb-3 font-bold" placeholder="Taip soalan di sini...">
+                    <input type="text" value="${q.q.replace(/"/g, '&quot;')}" onchange="handleAction('update-question', {qIndex: ${qIndex}, field: 'q', value: this.value})" class="w-full border p-2 rounded mb-3 font-bold" placeholder="Taip soalan di sini...">
                     <div class="grid grid-cols-2 gap-2 mb-3">
                         ${q.options.map((opt, oIndex) => `
                             <div class="flex items-center gap-2">
                                 <span class="text-xs text-gray-400 w-4">${oIndex+1}.</span>
-                                <input type="text" value="${opt}" onchange="handleAction('update-question', {qIndex: ${qIndex}, field: 'opt', optIndex: ${oIndex}, value: this.value})" class="w-full border p-2 rounded text-sm ${q.answer && q.answer === opt && opt !== '' ? 'border-green-500 bg-green-50' : ''}" placeholder="Pilihan ${oIndex+1}">
+                                <input type="text" value="${opt.replace(/"/g, '&quot;')}" onchange="handleAction('update-question', {qIndex: ${qIndex}, field: 'opt', optIndex: ${oIndex}, value: this.value})" class="w-full border p-2 rounded text-sm ${q.answer && q.answer === opt && opt !== '' ? 'border-green-500 bg-green-50' : ''}" placeholder="Pilihan ${oIndex+1}">
                             </div>
                         `).join('')}
                     </div>
@@ -645,7 +1036,7 @@
                         <label class="text-xs font-bold text-gray-500">Jawapan Tepat:</label>
                         <select onchange="handleAction('update-question', {qIndex: ${qIndex}, field: 'answer', value: this.value})" class="w-full border p-2 rounded text-sm bg-green-50 text-green-800 font-bold outline-none">
                             <option value="">-- Pilih Jawapan Tepat --</option>
-                            ${q.options.filter(o => o.trim() !== '').map(opt => `<option value="${opt}" ${q.answer === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                            ${q.options.filter(o => o.trim() !== '').map(opt => `<option value="${opt.replace(/"/g, '&quot;')}" ${q.answer === opt ? 'selected' : ''}>${opt}</option>`).join('')}
                         </select>
                     </div>
                 </div>
@@ -660,7 +1051,7 @@
                     
                     <div class="mb-6">
                         <label class="block text-sm font-bold text-gray-700 mb-1">Tajuk Kuiz / Modul</label>
-                        <input type="text" value="${eq.title}" onchange="handleAction('update-quiz-title', this.value)" class="w-full border-2 border-gray-300 rounded-lg p-3 text-lg font-bold focus:border-purple-500 outline-none" placeholder="Contoh: Kuiz Latihan Jawi Tahap 1">
+                        <input type="text" value="${eq.title.replace(/"/g, '&quot;')}" onchange="handleAction('update-quiz-title', this.value)" class="w-full border-2 border-gray-300 rounded-lg p-3 text-lg font-bold focus:border-purple-500 outline-none" placeholder="Contoh: Kuiz Latihan Jawi Tahap 1">
                     </div>
                     
                     <div class="mb-4 flex justify-between items-center bg-purple-50 p-3 rounded-lg border border-purple-100">
@@ -684,11 +1075,11 @@
                 <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col gap-3">
                     <div class="flex justify-between items-start">
                         <div>
-                            <span class="text-xs font-bold ${q.id < 1000 ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'} px-2 py-1 rounded uppercase mb-2 inline-block">${q.id < 1000 ? 'Modul KPM (Sistem)' : 'Modul Custom Guru'}</span>
+                            <span class="text-xs font-bold ${q.id < 10000 ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'} px-2 py-1 rounded uppercase mb-2 inline-block">${q.id < 10000 ? 'Modul KPM (Sistem)' : 'Modul Custom Guru'}</span>
                             <h4 class="font-bold text-gray-800 leading-tight">${q.title}</h4>
                             <p class="text-sm text-gray-500 mt-1"><i class="fas fa-list-ol mr-1"></i>${q.questions ? q.questions.length + ' Soalan' : 'Kuiz Embed'}</p>
                         </div>
-                        <div class="flex gap-1">
+                        <div class="flex gap-1 shrink-0">
                             <button onclick="handleAction('view-quiz-details', ${q.id})" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm text-xs font-bold" title="Lihat Soalan"><i class="fas fa-eye"></i></button>
                             <button onclick="handleAction('edit-quiz', ${q.id})" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded shadow-sm text-xs font-bold" title="Edit Modul"><i class="fas fa-edit"></i></button>
                             <button onclick="handleAction('delete-quiz', ${q.id})" class="bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded shadow-sm text-xs font-bold" title="Padam"><i class="fas fa-trash"></i></button>
@@ -722,7 +1113,7 @@
                             <span class="text-xs font-bold bg-gray-200 text-gray-700 px-2 py-1 rounded uppercase mb-2 inline-block">${e.type}</span>
                             <h4 class="font-bold text-gray-800">${e.title}</h4>
                         </div>
-                        <div class="flex gap-1">
+                        <div class="flex gap-1 shrink-0">
                             <button onclick="handleAction('view-exam-details', ${e.id})" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm text-xs font-bold" title="Lihat"><i class="fas fa-eye"></i></button>
                             <button onclick="handleAction('edit-exam', ${e.id})" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded shadow-sm text-xs font-bold" title="Edit"><i class="fas fa-edit"></i></button>
                             <button onclick="handleAction('delete-exam', ${e.id})" class="bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded shadow-sm text-xs font-bold" title="Padam"><i class="fas fa-trash"></i></button>
@@ -744,7 +1135,7 @@
                             <form onsubmit="handleFormSubmit(event, 'add-exam')">
                                 ${isEditing ? `<input type="hidden" name="id" value="${editData.id}">` : ''}
                                 <input type="text" name="title" value="${editData.title.replace(/"/g, '&quot;')}" required placeholder="Tajuk Ujian (Cth: Ujian Penggal 1)" class="w-full border border-gray-300 rounded-lg p-2 mb-3 text-sm">
-                                <textarea name="content" required rows="6" placeholder="Letakkan kod <iframe src='...'> di sini" class="w-full border border-gray-300 rounded-lg p-2 mb-3 text-sm font-mono">${editData.content}</textarea>
+                                <textarea name="content" required rows="6" placeholder="Letakkan kod <iframe src='...'> di sini" class="w-full border border-gray-300 rounded-lg p-2 mb-3 text-sm font-mono">${editData.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
                                 <button type="submit" class="w-full ${isEditing ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-emerald-600 hover:bg-emerald-700'} text-white py-2 rounded-lg font-bold shadow-sm">
                                     ${isEditing ? 'Simpan Perubahan' : 'Terbitkan Ujian'}
                                 </button>
@@ -922,9 +1313,6 @@
             `;
         }
 
-        // ==========================================
-        // FUNGSI QUIZ ENGINE
-        // ==========================================
         function renderStudentKuiz() {
             // 1. Paparan Mod Sedang Menjawab Kuiz
             if (state.quizSession && state.quizSession.active) {
