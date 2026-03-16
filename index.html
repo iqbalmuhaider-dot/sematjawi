@@ -16,6 +16,10 @@
         .sidebar-transition {
             transition: transform 0.3s ease-in-out;
         }
+        /* Custom Scrollbar for Builder */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #10b981; border-radius: 4px; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
@@ -40,22 +44,14 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
-        // Path Rujukan Pangkalan Data Firestore
         const myAppId = typeof __app_id !== 'undefined' ? __app_id : 'semat-jawi';
         const docRef = doc(db, 'artifacts', myAppId, 'public', 'data', 'appState', 'main');
+        
+        const SEED_VERSION = 3; // Versi untuk Force-Update modul KPM baharu ke dalam Firebase
 
-        // --- DATA MOCK / SIMULASI PANGKALAN DATA ---
-        let state = {
-            currentUser: null,
-            activeTab: 'utama',
-            isMobileMenuOpen: false,
-            selectedQuizCategory: null, 
-            modal: { isOpen: false, type: '', payload: null, title: '', message: '' },
-            quizSession: { active: false, quizId: null, currentIndex: 0, score: 0 },
-            users: [], // Senarai pengguna kini dikosongkan. Pengguna Google pertama akan jadi Admin.
-            notes: [
-                { id: 1, title: 'Asas 1 (Tahun 1): Pengenalan Huruf Jawi', type: 'html', content: `
+        // --- SISTEM NOTA (MODUL TERAS) ---
+        const SYSTEM_NOTES = [
+            { id: 1, title: 'Asas 1 (Tahun 1): Pengenalan Huruf Jawi', type: 'html', content: `
                     <div class="space-y-6 text-left" dir="ltr">
                         <!-- 1. Padanan Huruf -->
                         <div class="bg-white p-5 rounded-xl border border-emerald-100 shadow-sm">
@@ -82,281 +78,224 @@
                             </div>
                         </div>
 
-                        <!-- 2. Kaedah Sambungan Huruf (DIPERINCIKAN) -->
+                        <!-- 2. Kaedah Sambungan Huruf -->
                         <div class="bg-white p-5 rounded-xl border border-purple-100 shadow-sm">
                             <h4 class="font-bold text-lg text-purple-800 border-b-2 border-purple-200 pb-2 mb-4 flex items-center gap-2">
                                 <i class="fas fa-link"></i> 2. Kaedah Menyambung Huruf Jawi
                             </h4>
-                            <p class="text-gray-600 mb-6 text-sm">Untuk menyambung huruf Jawi (yang ditulis dari kanan ke kiri), murid-murid perlu mengingati <strong>3 Kumpulan Huruf</strong> ini:</p>
-                            
                             <!-- Kumpulan 1: Mesra -->
                             <div class="mb-6 bg-green-50 p-4 rounded-xl border border-green-200 shadow-inner">
-                                <h5 class="font-bold text-md text-green-800 mb-2 flex items-center gap-2">
-                                    <span class="bg-green-600 text-white px-3 py-1 rounded text-sm shadow-sm">Kumpulan 1</span> Huruf Mesra
-                                </h5>
-                                <p class="text-green-700 mb-3 text-sm font-medium">Boleh bersambung di <strong>sebelum (kanan)</strong> dan <strong>selepasnya (kiri)</strong>. Semua 28 huruf ini sangat mesra kawan!</p>
-                                <div class="flex flex-wrap gap-2 justify-center py-3 mb-2">
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ب</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ت</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ث</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ج</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">چ</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ح</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">خ</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">س</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ش</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ص</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ض</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ط</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ظ</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ع</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">غ</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ڠ</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ف</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ڤ</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ق</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ك</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ݢ</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ل</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">م</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ن</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ي</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ڽ</span>
-                                    <span class="bg-white border border-green-300 shadow-sm font-jawi text-2xl text-green-700 w-12 h-12 flex items-center justify-center rounded-lg">ه</span>
-                                </div>
-                                <div class="text-center text-sm font-bold text-green-900 bg-white py-3 rounded shadow-sm">
-                                    Contoh Ejaan: <span class="font-jawi text-2xl text-green-600 px-2" dir="rtl">م + س + ج + د = مسجد</span> (Semua huruf melekat!)
-                                </div>
+                                <h5 class="font-bold text-md text-green-800 mb-2 flex items-center gap-2"><span class="bg-green-600 text-white px-3 py-1 rounded text-sm shadow-sm">Kumpulan 1</span> Huruf Mesra</h5>
+                                <p class="text-green-700 mb-3 text-sm font-medium">Boleh bersambung di <strong>sebelum (kanan)</strong> dan <strong>selepasnya (kiri)</strong>.</p>
+                                <div class="text-center text-sm font-bold text-green-900 bg-white py-3 rounded shadow-sm">Contoh Ejaan: <span class="font-jawi text-2xl text-green-600 px-2" dir="rtl">م + س + ج + د = مسجد</span></div>
                             </div>
-
                             <!-- Kumpulan 2: Huruf Bongkak -->
                             <div class="mb-6 bg-red-50 p-4 rounded-xl border border-red-200 shadow-inner">
-                                <h5 class="font-bold text-md text-red-800 mb-2 flex items-center gap-2">
-                                    <span class="bg-red-600 text-white px-3 py-1 rounded text-sm shadow-sm">Kumpulan 2</span> Huruf Bongkak (Pemutus)
-                                </h5>
-                                <p class="text-red-700 mb-3 text-sm font-medium">Boleh bersambung di sebelum (kanan), tetapi <strong>TAK BOLEH bersambung selepasnya (kiri)</strong>. Mereka akan memutuskankan ejaan!</p>
+                                <h5 class="font-bold text-md text-red-800 mb-2 flex items-center gap-2"><span class="bg-red-600 text-white px-3 py-1 rounded text-sm shadow-sm">Kumpulan 2</span> Huruf Bongkak (Pemutus)</h5>
+                                <p class="text-red-700 mb-3 text-sm font-medium"><strong>TAK BOLEH bersambung selepasnya (kiri)</strong>. Mereka akan memutuskankan ejaan!</p>
                                 <div class="flex flex-wrap gap-4 justify-center py-4 mb-2">
-                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-4xl text-red-600 font-black w-16 h-16 flex items-center justify-center rounded-xl transform hover:scale-110 transition-transform">ا</span>
-                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-4xl text-red-600 font-black w-16 h-16 flex items-center justify-center rounded-xl transform hover:scale-110 transition-transform">د</span>
-                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-4xl text-red-600 font-black w-16 h-16 flex items-center justify-center rounded-xl transform hover:scale-110 transition-transform">ذ</span>
-                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-4xl text-red-600 font-black w-16 h-16 flex items-center justify-center rounded-xl transform hover:scale-110 transition-transform">ر</span>
-                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-4xl text-red-600 font-black w-16 h-16 flex items-center justify-center rounded-xl transform hover:scale-110 transition-transform">ز</span>
-                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-4xl text-red-600 font-black w-16 h-16 flex items-center justify-center rounded-xl transform hover:scale-110 transition-transform">و</span>
-                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-4xl text-red-600 font-black w-16 h-16 flex items-center justify-center rounded-xl transform hover:scale-110 transition-transform">ۏ</span>
-                                </div>
-                                <div class="text-center text-sm font-bold text-red-900 bg-white py-4 px-4 rounded shadow-sm">
-                                    Contoh Ejaan: <span class="font-jawi text-3xl text-red-600 px-3" dir="rtl">ر + و + س + ا = روسا</span><br>
-                                    <span class="text-xs font-normal text-red-700 mt-2 block">Lihat! Huruf 'Ra' dan 'Wau' menjauhi huruf selepasnya.</span>
-                                </div>
-                            </div>
-
-                            <!-- Kumpulan 3: Bebas -->
-                            <div class="mb-2 bg-gray-100 p-4 rounded-xl border border-gray-300 shadow-inner">
-                                <h5 class="font-bold text-md text-gray-800 mb-2 flex items-center gap-2">
-                                    <span class="bg-gray-600 text-white px-3 py-1 rounded text-sm shadow-sm">Kumpulan 3</span> Huruf Sombong (Bebas)
-                                </h5>
-                                <p class="text-gray-700 mb-3 text-sm font-medium">Hanya ada 1 huruf sahaja. Ia <strong>TAK BOLEH bersambung</strong> sama ada sebelum (kanan) atau selepas (kiri).</p>
-                                <div class="flex justify-center py-2 mb-2">
-                                    <span class="bg-white border-b-4 border-gray-400 shadow-md font-jawi text-4xl text-gray-800 font-black w-16 h-16 flex items-center justify-center rounded-xl">ء</span>
-                                </div>
-                                <div class="text-center text-sm font-bold text-gray-800 bg-white py-2 rounded shadow-sm">
-                                    Hamzah (Kedudukannya boleh berubah, tetapi sifatnya tidak bersambung)
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 3. Suku Kata Terbuka -->
-                        <div class="bg-white p-5 rounded-xl border border-blue-100 shadow-sm">
-                            <h4 class="font-bold text-lg text-blue-800 border-b-2 border-blue-200 pb-2 mb-4 flex items-center gap-2">
-                                <i class="fas fa-book-open"></i> 3. Perkataan Suku Kata Terbuka (1 Suku Kata)
-                            </h4>
-                            <p class="text-gray-600 mb-4 text-sm">Suku kata terbuka ialah perkataan yang berakhir dengan huruf vokal Jawi iaitu <strong>Alif (ا), Wau (و), atau Ya (ي)</strong>.</p>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-right">
-                                <div class="bg-blue-50 p-4 rounded-lg flex items-center justify-between border border-blue-100 flex-row-reverse">
-                                    <span class="font-bold text-gray-600 text-lg">Ba</span>
-                                    <span class="font-jawi text-3xl text-blue-800 font-bold" dir="rtl">ب + ا = با</span>
-                                </div>
-                                <div class="bg-blue-50 p-4 rounded-lg flex items-center justify-between border border-blue-100 flex-row-reverse">
-                                    <span class="font-bold text-gray-600 text-lg">Bu</span>
-                                    <span class="font-jawi text-3xl text-blue-800 font-bold" dir="rtl">ب + و = بو</span>
-                                </div>
-                                <div class="bg-blue-50 p-4 rounded-lg flex items-center justify-between border border-blue-100 flex-row-reverse">
-                                    <span class="font-bold text-gray-600 text-lg">Bi</span>
-                                    <span class="font-jawi text-3xl text-blue-800 font-bold" dir="rtl">ب + ي = بي</span>
-                                </div>
-                                <div class="bg-blue-50 p-4 rounded-lg flex items-center justify-between border border-blue-100 flex-row-reverse">
-                                    <span class="font-bold text-gray-600 text-lg">Yu</span>
-                                    <span class="font-jawi text-3xl text-blue-800 font-bold" dir="rtl">ي + و = يو</span>
+                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-3xl text-red-600 font-black w-12 h-12 flex items-center justify-center rounded-xl">ا</span>
+                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-3xl text-red-600 font-black w-12 h-12 flex items-center justify-center rounded-xl">د</span>
+                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-3xl text-red-600 font-black w-12 h-12 flex items-center justify-center rounded-xl">ذ</span>
+                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-3xl text-red-600 font-black w-12 h-12 flex items-center justify-center rounded-xl">ر</span>
+                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-3xl text-red-600 font-black w-12 h-12 flex items-center justify-center rounded-xl">ز</span>
+                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-3xl text-red-600 font-black w-12 h-12 flex items-center justify-center rounded-xl">و</span>
+                                    <span class="bg-white border-b-4 border-red-400 shadow-md font-jawi text-3xl text-red-600 font-black w-12 h-12 flex items-center justify-center rounded-xl">ۏ</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                ` },
-                { id: 2, title: 'Asas 2 (Tahun 2): Perkataan Jawi', type: 'text', content: 'Gabung huruf menjadi perkataan. 2 suku kata: بوكو (Buku), باجو (Baju), كايو (Kayu). 3 suku kata: كريتا (Kereta), كميرا (Kamera).' },
-                { id: 3, title: 'Asas 3 (Tahun 3): Ayat Mudah', type: 'text', content: 'Mari membaca ayat pendek: ساي سوك ماكن (Saya suka makan). ايبو بلي باجو بهارو (Ibu beli baju baharu). باڤ باچ بوكو (Bapa baca buku).' },
-                { id: 4, title: 'Asas 4 (Tahun 4): Ejaan Jawi & Kata Pinjaman', type: 'text', content: 'Perkataan pinjaman Arab dieja kekal seperti asal: صلاة (Solat), وضوء (Wuduk). Perkataan pinjaman Inggeris dieja ikut sebutan: بس (Bas), ساءينس (Sains).' },
-                { id: 5, title: 'Asas 5 (Tahun 5): Pemahaman Teks', type: 'text', content: 'Baca dan fahami petikan: أحمد سأورڠ موريد يڠ راجين. دي سلاكو منولوڠ ايبو باڤاث. (Ahmad seorang murid yang rajin. Dia selalu menolong ibu bapanya.)' },
-                { id: 6, title: 'Asas 6 (Tahun 6): Penguasaan Jawi', type: 'text', content: 'Latihan karangan dan imlak. Betulkan kesalahan ejaan dan bina ayat kompleks. Contoh: هاري اين هاري سوكن سكوله ساي. (Hari ini hari sukan sekolah saya.)' }
-            ],
-            quizzes: [
-                { id: 101, title: 'Kuiz Asas 1: Padanan Huruf Rumi ke Jawi (Set 1)', type: 'custom', questions: [
-                    { q: 'Apakah padanan huruf "A" dalam Jawi?', options: ['ا', 'ب', 'ت', 'ث'], answer: 'ا' },
-                    { q: 'Apakah padanan huruf "B" dalam Jawi?', options: ['ت', 'ب', 'ن', 'ي'], answer: 'ب' },
-                    { q: 'Apakah padanan huruf "T" dalam Jawi?', options: ['ب', 'ت', 'ث', 'س'], answer: 'ت' },
-                    { q: 'Apakah padanan huruf "J" dalam Jawi?', options: ['ح', 'خ', 'ج', 'چ'], answer: 'ج' },
-                    { q: 'Apakah padanan huruf "C" dalam Jawi?', options: ['ج', 'چ', 'ح', 'خ'], answer: 'چ' },
-                    { q: 'Apakah padanan huruf "D" dalam Jawi?', options: ['د', 'ذ', 'ر', 'ز'], answer: 'د' },
-                    { q: 'Apakah padanan huruf "R" dalam Jawi?', options: ['ز', 'ر', 'د', 'ذ'], answer: 'ر' },
-                    { q: 'Apakah padanan huruf "S" dalam Jawi?', options: ['ش', 'ص', 'س', 'ث'], answer: 'س' },
-                    { q: 'Apakah padanan huruf "Ng" dalam Jawi?', options: ['غ', 'ڠ', 'ع', 'ن'], answer: 'ڠ' },
-                    { q: 'Apakah padanan huruf "P" dalam Jawi?', options: ['ف', 'ڤ', 'ق', 'ك'], answer: 'ڤ' },
-                    { q: 'Apakah padanan huruf "K" dalam Jawi?', options: ['ك', 'ݢ', 'ق', 'ل'], answer: 'ك' },
-                    { q: 'Apakah padanan huruf "G" dalam Jawi?', options: ['ك', 'ݢ', 'ڠ', 'غ'], answer: 'ݢ' },
-                    { q: 'Apakah padanan huruf "L" dalam Jawi?', options: ['م', 'ن', 'ل', 'ي'], answer: 'ل' },
-                    { q: 'Apakah padanan huruf "M" dalam Jawi?', options: ['ن', 'م', 'و', 'ه'], answer: 'م' },
-                    { q: 'Apakah padanan huruf "N" dalam Jawi?', options: ['ب', 'ت', 'م', 'ن'], answer: 'ن' },
-                    { q: 'Apakah padanan huruf "W" dalam Jawi?', options: ['و', 'ۏ', 'ي', 'ر'], answer: 'و' },
-                    { q: 'Apakah padanan huruf "V" dalam Jawi?', options: ['و', 'ۏ', 'ف', 'ڤ'], answer: 'ۏ' },
-                    { q: 'Apakah padanan huruf "H" dalam Jawi?', options: ['خ', 'ح', 'ه', 'ڠ'], answer: 'ه' },
-                    { q: 'Apakah padanan huruf "Y" dalam Jawi?', options: ['ي', 'ڽ', 'ن', 'ت'], answer: 'ي' },
-                    { q: 'Apakah padanan huruf "Nya" dalam Jawi?', options: ['ث', 'ي', 'ڽ', 'پ'], answer: 'ڽ' }
-                ]},
-                { id: 102, title: 'Kuiz Asas 1: Padanan Huruf Jawi ke Rumi (Set 2)', type: 'custom', questions: [
-                    { q: 'Huruf "ا" mewakili huruf Rumi?', options: ['A', 'I', 'U', 'E'], answer: 'A' },
-                    { q: 'Huruf "ب" mewakili huruf Rumi?', options: ['P', 'B', 'T', 'N'], answer: 'B' },
-                    { q: 'Huruf "ت" mewakili huruf Rumi?', options: ['T', 'S', 'B', 'N'], answer: 'T' },
-                    { q: 'Huruf "ج" mewakili huruf Rumi?', options: ['C', 'J', 'H', 'Kh'], answer: 'J' },
-                    { q: 'Huruf "چ" mewakili huruf Rumi?', options: ['J', 'C', 'Sy', 'Ny'], answer: 'C' },
-                    { q: 'Huruf "د" mewakili huruf Rumi?', options: ['D', 'R', 'Z', 'S'], answer: 'D' },
-                    { q: 'Huruf "ر" mewakili huruf Rumi?', options: ['D', 'Z', 'R', 'W'], answer: 'R' },
-                    { q: 'Huruf "س" mewakili huruf Rumi?', options: ['Sy', 'S', 'Th', 'Sh'], answer: 'S' },
-                    { q: 'Huruf "ڠ" mewakili huruf Rumi?', options: ['Ng', 'Ny', 'Gh', 'N'], answer: 'Ng' },
-                    { q: 'Huruf "ڤ" mewakili huruf Rumi?', options: ['F', 'V', 'P', 'Q'], answer: 'P' },
-                    { q: 'Huruf "ك" mewakili huruf Rumi?', options: ['G', 'K', 'Q', 'L'], answer: 'K' },
-                    { q: 'Huruf "ݢ" mewakili huruf Rumi?', options: ['K', 'G', 'Ng', 'Ny'], answer: 'G' },
-                    { q: 'Huruf "ل" mewakili huruf Rumi?', options: ['M', 'N', 'L', 'R'], answer: 'L' },
-                    { q: 'Huruf "م" mewakili huruf Rumi?', options: ['N', 'M', 'W', 'Y'], answer: 'M' },
-                    { q: 'Huruf "ن" mewakili huruf Rumi?', options: ['B', 'T', 'N', 'Ny'], answer: 'N' },
-                    { q: 'Huruf "و" mewakili huruf vokal Rumi?', options: ['A', 'U/O', 'I/E', 'Y'], answer: 'U/O' },
-                    { q: 'Huruf "ۏ" mewakili huruf Rumi?', options: ['W', 'V', 'F', 'P'], answer: 'V' },
-                    { q: 'Huruf "ه" mewakili huruf Rumi?', options: ['H', 'Kh', 'Gh', 'A'], answer: 'H' },
-                    { q: 'Huruf "ي" mewakili huruf vokal Rumi?', options: ['A', 'U/O', 'I/E', 'W'], answer: 'I/E' },
-                    { q: 'Huruf "ڽ" mewakili huruf Rumi?', options: ['Ng', 'Ny', 'Y', 'N'], answer: 'Ny' }
-                ]},
-                { id: 103, title: 'Kuiz Asas 1: Uji Minda Padanan (Set 3)', type: 'custom', questions: [
-                    { q: 'Antara berikut, manakah padanan yang BETUL?', options: ['B = ڤ', 'P = ب', 'M = م', 'N = ل'], answer: 'M = م' },
-                    { q: 'Antara berikut, manakah padanan yang SALAH?', options: ['S = س', 'K = ݢ', 'J = ج', 'R = ر'], answer: 'K = ݢ' },
-                    { q: 'Huruf Rumi "Ng" padanannya ialah?', options: ['غ', 'ع', 'ڠ', 'ڽ'], answer: 'ڠ' },
-                    { q: 'Huruf "C" dipadankan dengan huruf yang mempunyai berapa titik?', options: ['1 titik di bawah', '3 titik di dalam', '1 titik di atas', 'Tiada titik'], answer: '3 titik di dalam' },
-                    { q: 'Huruf "P" dipadankan dengan huruf yang ada berapa titik?', options: ['1 titik di atas', '3 titik di atas', '1 titik di bawah', 'Tiada titik'], answer: '3 titik di atas' },
-                    { q: 'Vokal "A, I, U" dalam Jawi diwakili oleh?', options: ['ا, و, ي', 'ا, ي, و', 'ي, و, ا', 'و, ا, ي'], answer: 'ا, ي, و' },
-                    { q: 'Padanan huruf "Ny" ialah?', options: ['ن', 'ي', 'ڽ', 'ث'], answer: 'ڽ' },
-                    { q: 'Huruf Jawi "ف" mewakili huruf Rumi?', options: ['P', 'V', 'F', 'W'], answer: 'F' },
-                    { q: 'Padanan huruf "G" (Ga) ialah?', options: ['ك', 'ݢ', 'ق', 'ڠ'], answer: 'ݢ' },
-                    { q: 'Jika R=ر, maka Z=?', options: ['د', 'ذ', 'ز', 'س'], answer: 'ز' },
-                    { q: 'Huruf Rumi "H" mempunyai padanan Jawi?', options: ['ح', 'خ', 'ه', 'Semua di atas'], answer: 'Semua di atas' },
-                    { q: 'Manakah kumpulan vokal Jawi yang betul?', options: ['ا , ب , ت', 'ا , و , ي', 'و , ي , ن', 'ا , ر , ز'], answer: 'ا , و , ي' },
-                    { q: 'Huruf "ۏ" (Va) mempunyai titik di bahagian?', options: ['Bawah', 'Atas (1 titik)', 'Atas (3 titik)', 'Tiada titik'], answer: 'Atas (1 titik)' },
-                    { q: 'Padanan bagi huruf konsonan "T" ialah?', options: ['ب', 'ت', 'ث', 'ن'], answer: 'ت' },
-                    { q: 'Pilih padanan yang BETUL bagi "L".', options: ['ل', 'م', 'ن', 'ر'], answer: 'ل' },
-                    { q: 'Huruf "ش" mewakili bunyi?', options: ['S', 'Sy', 'Th', 'Kh'], answer: 'Sy' },
-                    { q: 'Huruf Rumi "Kh" (Kha) padanannya ialah?', options: ['ح', 'خ', 'ه', 'غ'], answer: 'خ' },
-                    { q: 'Mana padanan yang SALAH?', options: ['C = چ', 'P = ڤ', 'Ng = غ', 'Ny = ڽ'], answer: 'Ng = غ' },
-                    { q: 'Huruf Jawi "ث" mewakili bunyi?', options: ['S', 'Th', 'Sy', 'T'], answer: 'Th' },
-                    { q: 'Pilih padanan vokal yang betul.', options: ['U = ا', 'I = ي', 'A = و', 'O = ي'], answer: 'I = ي' }
-                ]},
-                { id: 104, title: 'Kuiz Asas 1: Kenali Huruf Sambung & Bongkak (Set 1)', type: 'custom', questions: [
-                    { q: 'Bolehkah huruf "Alif" (ا) disambung dengan huruf SELEPASNYA?', options: ['Boleh', 'Tidak Boleh', 'Boleh jika di hujung', 'Semua salah'], answer: 'Tidak Boleh' },
-                    { q: 'Antara berikut, manakah HURUF BONGKAK (Pemutus)?', options: ['ب', 'ت', 'د', 'س'], answer: 'د' },
-                    { q: 'Antara berikut, manakah HURUF BONGKAK?', options: ['ج', 'ر', 'م', 'ن'], answer: 'ر' },
-                    { q: 'Antara berikut, manakah HURUF BONGKAK?', options: ['ل', 'ي', 'و', 'ك'], answer: 'و' },
-                    { q: 'Huruf manakah yang TIDAK BOLEH bersambung selepasnya?', options: ['ز', 'س', 'ش', 'ص'], answer: 'ز' },
-                    { q: 'Berapakah jumlah Huruf Bongkak (pemutus)?', options: ['5 huruf', '6 huruf', '7 huruf', '8 huruf'], answer: '7 huruf' },
-                    { q: 'Huruf manakah yang BOLEH bersambung sebelum dan selepasnya?', options: ['ا', 'د', 'ب', 'ر'], answer: 'ب' },
-                    { q: 'Pilih huruf yang MESRA (boleh sambung depan belakang).', options: ['ز', 'م', 'و', 'ۏ'], answer: 'م' },
-                    { q: 'Pilih huruf yang MESRA bersambung.', options: ['س', 'د', 'ذ', 'ا'], answer: 'س' },
-                    { q: 'Huruf "Hamzah" (ء) tergolong dalam kumpulan mana?', options: ['Boleh sambung', 'Bongkak', 'Bebas (Tidak bersambung)', 'Mesra'], answer: 'Bebas (Tidak bersambung)' },
-                    { q: 'Cantuman huruf (ب + ا) menjadi?', options: ['بـا', 'با', 'ب ا', 'اب'], answer: 'با' },
-                    { q: 'Cantuman huruf (ت + و) menjadi?', options: ['تـو', 'تو', 'ت و', 'وت'], answer: 'تو' },
-                    { q: 'Cantuman huruf (س + ي) menjadi?', options: ['سي', 'سـي', 'س ي', 'يس'], answer: 'سي' },
-                    { q: 'Cantuman huruf (ر + و) menjadi?', options: ['رو', 'رـو', 'ر و', 'ور'], answer: 'رو' },
-                    { q: 'Cantuman huruf (د + ا) menjadi?', options: ['دا', 'دـا', 'د ا', 'اد'], answer: 'دا' },
-                    { q: 'Kenapa huruf "ر" dan "و" dalam "رو" tidak melekat?', options: ['Sebab "ر" huruf mesra', 'Sebab "ر" huruf bongkak', 'Sebab "و" huruf bongkak', 'Sebab kedua-duanya huruf mesra'], answer: 'Sebab "ر" huruf bongkak' },
-                    { q: 'Cantuman huruf (م + ا) menjadi?', options: ['ما', 'مـا', 'م ا', 'ام'], answer: 'ما' },
-                    { q: 'Cantuman huruf (ن + ي) menjadi?', options: ['ني', 'نـي', 'ن ي', 'ين'], answer: 'ني' },
-                    { q: 'Bolehkah huruf "Zal" (ذ) bersambung dengan "Alif" (ا)?', options: ['Boleh (ذا)', 'Tidak Boleh (ذ ا)', 'Boleh di tengah sahaja', 'Salah'], answer: 'Tidak Boleh (ذ ا)' },
-                    { q: 'Huruf manakah yang TIDAK BOLEH bersambung selepasnya?', options: ['ك', 'ل', 'م', 'ۏ'], answer: 'ۏ' }
-                ]},
-                { id: 105, title: 'Kuiz Asas 1: Cantuman Suku Kata Terbuka (Set 2)', type: 'custom', questions: [
-                    { q: 'Sambungkan huruf: ب + و + ك + و', options: ['بوكو', 'ب وك و', 'بوك و', 'ب وكو'], answer: 'بوكو' },
-                    { q: 'Sambungkan huruf: ب + ا + ج + و', options: ['باجو', 'ب اج و', 'باج و', 'ب اجو'], answer: 'باجو' },
-                    { q: 'Sambungkan huruf: م + ي + ج + ا', options: ['ميج ا', 'م يجا', 'ميجا', 'م ي ج ا'], answer: 'ميجا' },
-                    { q: 'Sambungkan huruf: ت + و + ڤ + ي', options: ['توڤ ي', 'توڤي', 'ت وڤي', 'ت و ڤ ي'], answer: 'توڤي' },
-                    { q: 'Sambungkan huruf: ر + و + س + ا', options: ['روسا', 'ر وسا', 'روس ا', 'ر و س ا'], answer: 'روسا' },
-                    { q: 'Sambungkan huruf: ڤ + ا + ك + و', options: ['ڤاكو', 'ڤ اك و', 'ڤاك و', 'ڤ اكو'], answer: 'ڤاكو' },
-                    { q: 'Sambungkan huruf: ل + ا + ر + ي', options: ['لاري', 'ل اري', 'لار ي', 'ل ا ر ي'], answer: 'لاري' },
-                    { q: 'Sambungkan huruf: ݢ + ي + ݢ + ي', options: ['ݢيݢي', 'ݢ يݢي', 'ݢيݢ ي', 'ݢ ي ݢ ي'], answer: 'ݢيݢي' },
-                    { q: 'Sambungkan huruf: ك + و + د + ا', options: ['كودا', 'ك ود ا', 'كود ا', 'ك ودا'], answer: 'كودا' },
-                    { q: 'Sambungkan huruf: س + و + د + و', options: ['سودو', 'س ود و', 'سود و', 'س ودو'], answer: 'سودو' },
-                    { q: 'Dalam perkataan "روسا", kenapa huruf ر dan و terpisah?', options: ['Kerana ر huruf bongkak', 'Kerana و huruf bongkak', 'Kerana س huruf mesra', 'Kerana ا huruf bongkak'], answer: 'Kerana ر huruf bongkak' },
-                    { q: 'Dalam perkataan "كودا", huruf apakah yang memutuskan sambungan di tengah?', options: ['ك', 'و', 'د', 'ا'], answer: 'و' },
-                    { q: 'Sambungkan huruf: چ + ي + ل + ي', options: ['چيلي', 'چ يل ي', 'چيل ي', 'چ ي ل ي'], answer: 'چيلي' },
-                    { q: 'Sambungkan huruf: ڽ + ا + ڽ + ي', options: ['ڽاڽي', 'ڽ اڽ ي', 'ڽاڽ ي', 'ڽ ا ڽ ي'], answer: 'ڽاڽي' },
-                    { q: 'Sambungkan huruf: ل + و + ك + ا', options: ['لوكا', 'ل وك ا', 'لوك ا', 'ل وكا'], answer: 'لوكا' },
-                    { q: 'Apakah perkataan bagi cantuman: م + ا + ت + ا ?', options: ['ميتي', 'موتو', 'ماتا', 'ماتي'], answer: 'ماتا' },
-                    { q: 'Apakah perkataan bagi cantuman: ر + ا + ج + ا ?', options: ['روجي', 'راجا', 'ريجو', 'راجو'], answer: 'راجا' },
-                    { q: 'Apakah perkataan bagi cantuman: س + و + ك + ا ?', options: ['سيكا', 'سوكي', 'سوكان', 'سوكا'], answer: 'سوكا' },
-                    { q: 'Sambungkan huruf: ݢ + و + ر + و', options: ['ݢورو', 'ݢ ور و', 'ݢور و', 'ݢ ورو'], answer: 'ݢورو' },
-                    { q: 'Kenapa huruf ر dan و berpisah dalam "ݢورو"?', options: ['ر huruf mesra', 'ر huruf bongkak', 'ݢ huruf bongkak', 'و huruf mesra'], answer: 'ر huruf bongkak' }
-                ]},
-                { id: 106, title: 'Kuiz Asas 1: Kenal Pasti Kesalahan Cantuman (Set 3)', type: 'custom', questions: [
-                    { q: 'Antara berikut, manakah cantuman yang SALAH?', options: ['با', 'دا', 'زا', 'دـا'], answer: 'دـا' },
-                    { q: 'Pilih cantuman yang BETUL bagi (ا + ب).', options: ['اب', 'اـب', 'با', 'بـا'], answer: 'اب' },
-                    { q: 'Mana ejaan "Susu" yang SALAH cantumannya?', options: ['سوسو', 'سـوسـو', 'س وس و', 'سوسـو'], answer: 'سـوسـو' },
-                    { q: 'Pilih ejaan "Dada" yang BETUL bentuknya.', options: ['دادا', 'دـادـا', 'داـدا', 'دادـا'], answer: 'دادا' },
-                    { q: 'Apakah kesalahan dalam ejaan "رـوـسـا" ?', options: ['Huruf Alif salah', 'Huruf Sin salah', 'Huruf Ra & Wau disambung paksa', 'Tiada kesalahan'], answer: 'Huruf Ra & Wau disambung paksa' },
-                    { q: 'Manakah cantuman (و + ا) yang betul?', options: ['وا', 'وـا', 'او', 'اـو'], answer: 'وا' },
-                    { q: 'Manakah bentuk huruf "Jim" (ج) bila di AWAL perkataan?', options: ['جـ', 'ـجـ', 'ـج', 'ج'], answer: 'جـ' },
-                    { q: 'Manakah bentuk huruf "Sin" (س) bila di TENGAH perkataan?', options: ['سـ', 'ـسـ', 'ـس', 'س'], answer: 'ـسـ' },
-                    { q: 'Manakah bentuk huruf "Mim" (م) bila di AKHIR perkataan (bersambung)?', options: ['مـ', 'ـمـ', 'ـم', 'م'], answer: 'ـم' },
-                    { q: 'Manakah cantuman (ت + ي) yang betul?', options: ['تي', 'تـي', 'يت', 'يـت'], answer: 'تي' },
-                    { q: 'Pilih ejaan "Pipi" yang BETUL.', options: ['ڤيڤي', 'ڤـيڤـي', 'ڤي ڤي', 'ڤ ي ڤ ي'], answer: 'ڤيڤي' },
-                    { q: 'Mana ejaan yang SALAH bagi "Roti"?', options: ['روتي', 'رـوتي', 'ر و ت ي', 'رو ت ي'], answer: 'رـوتي' },
-                    { q: 'Adakah huruf "Zai" (ز) menukar bentuknya bila berada di awal ayat?', options: ['Ya', 'Tidak, kekal ز', 'Menjadi زـ', 'Menjadi ـز'], answer: 'Tidak, kekal ز' },
-                    { q: 'Pilih ejaan "Bubu" yang BETUL.', options: ['بوبو', 'بـوبـو', 'بو ب و', 'ب وب و'], answer: 'بوبو' },
-                    { q: 'Manakah antara kata ini yang SEMUA hurufnya terpisah?', options: ['دادا (Dada)', 'روزا (Roza)', 'رورو (Roro)', 'Semua di atas'], answer: 'Semua di atas' },
-                    { q: 'Pilih ejaan "Nasi" yang BETUL.', options: ['ناسي', 'نـاسي', 'ناسـي', 'نـاسـي'], answer: 'ناسي' },
-                    { q: 'Kenapa "نا" boleh bersambung tetapi "سي" dipisahkan dari "Alif"?', options: ['Sebab Alif huruf bongkak', 'Sebab Nun huruf bongkak', 'Sebab Sin huruf bongkak', 'Sebab Ya huruf bongkak'], answer: 'Sebab Alif huruf bongkak' },
-                    { q: 'Manakah antara perkataan ini mempunyai 1 Huruf Bongkak di tengah?', options: ['ميجا (Meja)', 'بوكو (Buku)', 'ڤيني (Peni)', 'سيلي (Sili)'], answer: 'بوكو (Buku)' },
-                    { q: 'Pilih ejaan "Batu" yang betul.', options: ['باتو', 'بـاتو', 'باتـو', 'بـاتـو'], answer: 'باتو' },
-                    { q: 'Apakah bentuk huruf "Kaf" (ك) apabila bersambung di hadapan (Kaf + Alif)?', options: ['كا', 'كـا', 'ك ا', 'اك'], answer: 'كا' }
-                ]},
-                { id: 2, title: 'Kuiz Asas 2: Perkataan Jawi (Tahun 2)', type: 'custom', questions: [
-                    { q: 'Eja "Meja" dalam Jawi.', options: ['ميجا', 'ماجا', 'موجا', 'ميجو'], answer: 'ميجا' },
-                    { q: 'Eja "Kereta" dalam Jawi (Tiga Suku Kata).', options: ['كريتا', 'كريت', 'كاريتا', 'كوريت'], answer: 'كريتا' },
-                    { q: 'Perkataan "بوكو" dibaca sebagai?', options: ['Buku', 'Baka', 'Biku', 'Boka'], answer: 'Buku' }
-                ]},
-                { id: 3, title: 'Kuiz Asas 3: Ayat Mudah (Tahun 3)', type: 'custom', questions: [
-                    { q: '"ساي اد بوكو" bermaksud?', options: ['Saya ada buku', 'Saya ada baju', 'Saya baca buku', 'Siti ada buku'], answer: 'Saya ada buku' },
-                    { q: 'Pilih ejaan yang betul untuk "Bapa beli bola".', options: ['باڤ بلي بولا', 'باڤ بيلي بولا', 'بڤ بلي بول', 'باڤا بلي بولا'], answer: 'باڤ بلي بولا' }
-                ]},
-                { id: 4, title: 'Kuiz Asas 4: Ejaan & Pinjaman (Tahun 4)', type: 'custom', questions: [
-                    { q: 'Ejaan pinjaman Inggeris "Sains" dalam Jawi ialah?', options: ['ساءينس', 'ساینس', 'ساءيس', 'صاءينس'], answer: 'ساءينس' },
-                    { q: 'Perkataan pinjaman Arab "Wuduk" dieja sebagai?', options: ['وضوء', 'ودوق', 'ودوک', 'وذوء'], answer: 'وضوء' }
-                ]},
-                { id: 5, title: 'Kuiz Asas 5: Pemahaman Teks (Tahun 5)', type: 'custom', questions: [
-                    { q: '"دي سأورڠ ݢورو" bermaksud?', options: ['Dia seorang guru', 'Dia seorang murid', 'Dia sayang guru', 'Dia suka guru'], answer: 'Dia seorang guru' },
-                    { q: 'Sambungkan huruf (س + ك + و + ل + ه) menjadi perkataan yang betul.', options: ['سكوله', 'ساكوله', 'سكولاه', 'سکولہ'], answer: 'سكوله' }
-                ]},
-                { id: 6, title: 'Kuiz Asas 6: Penguasaan (Tahun 6)', type: 'custom', questions: [
-                    { q: 'Cari kesalahan ejaan: Antara berikut yang manakah SALAH ejaannya?', options: ['سيكول', 'تيليۏيشن', 'كومڤيوتر', 'اونيۏرسيتي'], answer: 'سيكول' },
-                    { q: 'Lengkapkan ayat: احمد ممباچ ___ (Ahmad membaca buku).', options: ['بوكو', 'باجو', 'روما', 'ميجا'], answer: 'بوكو' }
-                ]}
-            ],
-            exams: [
-                { id: 1, title: 'Ujian Bulanan 1', type: 'embed', content: '<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSc.../viewform?embedded=true" width="100%" height="500" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>' }
-            ]
+            ` },
+            { id: 2, title: 'Asas 2: 2 Suku Kata Terbuka', type: 'html', content: `
+                    <div class="space-y-6 text-left" dir="ltr">
+                        <div class="bg-white p-5 rounded-xl border border-blue-100 shadow-sm">
+                            <h4 class="font-bold text-lg text-blue-800 border-b-2 border-blue-200 pb-2 mb-4 flex items-center gap-2">
+                                <i class="fas fa-puzzle-piece"></i> 1. Konsep 2 Suku Kata Terbuka
+                            </h4>
+                            <p class="text-gray-600 mb-4 text-sm">Terdiri daripada dua suku kata yang digabungkan. Setiap suku kata berakhir dengan huruf vokal (ا, و, ي).</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center font-bold">
+                                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                    <p class="text-gray-500 text-sm mb-2">Buku</p>
+                                    <div class="flex justify-center items-center gap-3 text-2xl font-jawi text-blue-900" dir="rtl">
+                                        <span>بو</span> <span class="text-blue-400">+</span> <span>كو</span> <span class="text-blue-400">=</span> <span class="text-3xl font-black">بوكو</span>
+                                    </div>
+                                </div>
+                                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                    <p class="text-gray-500 text-sm mb-2">Baju</p>
+                                    <div class="flex justify-center items-center gap-3 text-2xl font-jawi text-blue-900" dir="rtl">
+                                        <span>با</span> <span class="text-blue-400">+</span> <span>جو</span> <span class="text-blue-400">=</span> <span class="text-3xl font-black">باجو</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            ` },
+            { id: 3, title: 'Asas 2: Suku Kata Tertutup (KVK Vokal A)', type: 'html', content: `
+                    <div class="space-y-6 text-left" dir="ltr">
+                        <div class="bg-white p-5 rounded-xl border border-red-100 shadow-sm">
+                            <h4 class="font-bold text-lg text-red-800 border-b-2 border-red-200 pb-2 mb-4 flex items-center gap-2">
+                                <i class="fas fa-scissors"></i> 1. Hukum Buang Huruf Alif (KVK Vokal 'a')
+                            </h4>
+                            <p class="text-gray-600 mb-4 text-sm">Apabila perkataan Melayu jati mempunyai suku kata tertutup (Konsonan-Vokal-Konsonan) dengan vokal 'a' di tengahnya, huruf Alif (ا) tersebut <strong>Mesti Digugurkan (dibuang)</strong>.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center font-bold">
+                                <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                                    <p class="text-gray-500 text-sm mb-2">B A S (Bas)</p>
+                                    <div class="flex justify-center items-center gap-2 text-2xl font-jawi text-red-900" dir="rtl">
+                                        <span>ب</span> <span class="text-red-400 line-through">ا</span> <span>س</span> <span class="text-red-400">=</span> <span class="text-4xl font-black">بس</span>
+                                    </div>
+                                </div>
+                                <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                                    <p class="text-gray-500 text-sm mb-2">J A M (Jam)</p>
+                                    <div class="flex justify-center items-center gap-2 text-2xl font-jawi text-red-900" dir="rtl">
+                                        <span>ج</span> <span class="text-red-400 line-through">ا</span> <span>م</span> <span class="text-red-400">=</span> <span class="text-4xl font-black">جم</span>
+                                    </div>
+                                </div>
+                                <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                                    <p class="text-gray-500 text-sm mb-2">C A T (Cat)</p>
+                                    <div class="flex justify-center items-center gap-2 text-2xl font-jawi text-red-900" dir="rtl">
+                                        <span>چ</span> <span class="text-red-400 line-through">ا</span> <span>ت</span> <span class="text-red-400">=</span> <span class="text-4xl font-black">چت</span>
+                                    </div>
+                                </div>
+                                <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                                    <p class="text-gray-500 text-sm mb-2">P A M (Pam)</p>
+                                    <div class="flex justify-center items-center gap-2 text-2xl font-jawi text-red-900" dir="rtl">
+                                        <span>ڤ</span> <span class="text-red-400 line-through">ا</span> <span>م</span> <span class="text-red-400">=</span> <span class="text-4xl font-black">ڤم</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-xl border border-green-100 shadow-sm">
+                            <h4 class="font-bold text-lg text-green-800 border-b-2 border-green-200 pb-2 mb-4 flex items-center gap-2">
+                                <i class="fas fa-shield-alt"></i> 2. Pengecualian (Kekal Huruf Alif)
+                            </h4>
+                            <p class="text-gray-600 mb-4 text-sm">Huruf Alif <strong>dikekalkan</strong> dalam keadaan berikut:</p>
+                            <ul class="list-disc pl-5 text-gray-700 space-y-2 mb-6 text-sm">
+                                <li>Perkataan yang bermula dengan huruf <strong>Wau (و)</strong> atau <strong>Ya (ي)</strong>.</li>
+                                <li>Perkataan pinjaman <strong>Bahasa Inggeris</strong>.</li>
+                            </ul>
+                            <div class="flex flex-wrap gap-4 justify-center">
+                                <div class="bg-green-50 border border-green-200 px-6 py-3 rounded-xl text-center shadow-sm">
+                                    <span class="block text-gray-500 text-xs uppercase mb-1">Mula huruf Wau</span>
+                                    <span class="font-jawi text-3xl text-green-900 font-bold">واڠ</span> (Wang)
+                                </div>
+                                <div class="bg-green-50 border border-green-200 px-6 py-3 rounded-xl text-center shadow-sm">
+                                    <span class="block text-gray-500 text-xs uppercase mb-1">Mula huruf Ya</span>
+                                    <span class="font-jawi text-3xl text-green-900 font-bold">ياڠ</span> (Yang)
+                                </div>
+                                <div class="bg-green-50 border border-green-200 px-6 py-3 rounded-xl text-center shadow-sm">
+                                    <span class="block text-gray-500 text-xs uppercase mb-1">Pinjaman Inggeris</span>
+                                    <span class="font-jawi text-3xl text-green-900 font-bold">كاد</span> (Kad)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            ` },
+            { id: 4, title: 'Asas 3 (Tahun 3): Ayat Mudah', type: 'text', content: 'Mari membaca ayat pendek: ساي سوك ماكن (Saya suka makan). ايبو بلي باجو بهارو (Ibu beli baju baharu). باڤ باچ بوكو (Bapa baca buku).' },
+            { id: 5, title: 'Asas 4 (Tahun 4): Ejaan Jawi & Kata Pinjaman', type: 'text', content: 'Perkataan pinjaman Arab dieja kekal seperti asal: صلاة (Solat), وضوء (Wuduk). Perkataan pinjaman Inggeris dieja ikut sebutan: بس (Bas), ساءينس (Sains).' },
+            { id: 6, title: 'Asas 5 & 6: Pemahaman & Teks', type: 'text', content: 'Baca dan fahami petikan: أحمد سأورڠ موريد يڠ راجين. Latihan karangan dan imlak.' }
+        ];
+
+        // --- SISTEM KUIZ (MODUL TERAS) ---
+        const SYSTEM_QUIZZES = [
+            // ASAS 1 (101-109 diabaikan kod ini utk ringkas, saya gabungkan sebahagian utk kekalkan fungsi)
+            { id: 101, title: 'Kuiz Asas 1: Padanan Huruf Rumi ke Jawi (Set 1)', type: 'custom', questions: [
+                { q: 'Apakah padanan huruf "A" dalam Jawi?', options: ['ا', 'ب', 'ت', 'ث'], answer: 'ا' },
+                { q: 'Apakah padanan huruf "B" dalam Jawi?', options: ['ت', 'ب', 'ن', 'ي'], answer: 'ب' },
+                { q: 'Apakah padanan huruf "C" dalam Jawi?', options: ['ج', 'چ', 'ح', 'خ'], answer: 'چ' }
+            ]},
+            { id: 104, title: 'Kuiz Asas 1: Kenali Huruf Sambung & Bongkak (Set 4)', type: 'custom', questions: [
+                { q: 'Bolehkah huruf "Alif" (ا) disambung dengan huruf SELEPASNYA?', options: ['Boleh', 'Tidak Boleh', 'Boleh jika di hujung', 'Semua salah'], answer: 'Tidak Boleh' },
+                { q: 'Antara berikut, manakah HURUF BONGKAK (Pemutus)?', options: ['ب', 'ت', 'د', 'س'], answer: 'د' }
+            ]},
+            { id: 201, title: 'Kuiz Asas 2: 2 Suku Kata Terbuka (Rumi ke Jawi) (Set 1)', type: 'custom', questions: [
+                { q: 'Eja "Baju" dalam Jawi.', options: ['باجو', 'بوجو', 'بيجو', 'باجا'], answer: 'باجو' },
+                { q: 'Eja "Buku" dalam Jawi.', options: ['باكو', 'بوكو', 'بيكو', 'بوكا'], answer: 'بوكو' }
+            ]},
+            
+            // --- KUIZ BAHARU KVK (ASAS 2) ---
+            { id: 204, title: 'Kuiz Asas 2: KVK Vokal A (Rumi ke Jawi) (Set 4)', type: 'custom', questions: [
+                { q: 'Eja "Bas" dalam Jawi.', options: ['باس', 'بس', 'بيس', 'بوس'], answer: 'بس' },
+                { q: 'Eja "Jam" dalam Jawi.', options: ['جام', 'جوم', 'جم', 'جيم'], answer: 'جم' },
+                { q: 'Eja "Cat" dalam Jawi.', options: ['چات', 'چت', 'چوت', 'چيت'], answer: 'چت' },
+                { q: 'Eja "Pam" dalam Jawi.', options: ['ڤام', 'ڤوم', 'ڤيم', 'ڤم'], answer: 'ڤم' },
+                { q: 'Eja "Kad" (Pinjaman Inggeris).', options: ['كد', 'كاد', 'كود', 'كيد'], answer: 'كاد' },
+                { q: 'Eja "Gas" dalam Jawi.', options: ['ݢاس', 'ݢوس', 'ݢس', 'ݢيس'], answer: 'ݢس' },
+                { q: 'Eja "Tas" dalam Jawi.', options: ['تاس', 'تس', 'توس', 'تيس'], answer: 'تس' },
+                { q: 'Eja "Gam" dalam Jawi.', options: ['ݢم', 'ݢام', 'ݢوم', 'ݢيم'], answer: 'ݢم' },
+                { q: 'Eja "Lap" dalam Jawi.', options: ['لاڤ', 'لوڤ', 'لڤ', 'ليڤ'], answer: 'لڤ' },
+                { q: 'Eja "Pas" dalam Jawi.', options: ['ڤاس', 'ڤوس', 'ڤيس', 'ڤس'], answer: 'ڤس' },
+                { q: 'Eja "Cap" dalam Jawi.', options: ['چاڤ', 'چڤ', 'چيڤ', 'چوڤ'], answer: 'چڤ' },
+                { q: 'Eja "Wang" (Bermula Wau).', options: ['وڠ', 'واڠ', 'ويڠ', 'ووڠ'], answer: 'واڠ' },
+                { q: 'Eja "Wap" (Bermula Wau).', options: ['واڤ', 'وڤ', 'ويڤ', 'ووڤ'], answer: 'واڤ' },
+                { q: 'Eja "Yang" (Bermula Ya).', options: ['يڠ', 'ياڠ', 'يوڠ', 'ييڠ'], answer: 'ياڠ' },
+                { q: 'Eja "Dan" (Pengecualian/Tradisi).', options: ['دن', 'دين', 'دون', 'دان'], answer: 'دان' },
+                { q: 'Eja "Tar" dalam Jawi.', options: ['تار', 'تر', 'تير', 'تور'], answer: 'تر' },
+                { q: 'Eja "Rak" dalam Jawi.', options: ['راك', 'رق', 'ريك', 'روق'], answer: 'رق' },
+                { q: 'Eja "Pak" dalam Jawi.', options: ['ڤاك', 'ڤوق', 'ڤيق', 'ڤق'], answer: 'ڤق' },
+                { q: 'Eja "Cas" dalam Jawi.', options: ['چاس', 'چس', 'چيس', 'چوس'], answer: 'چس' },
+                { q: 'Eja "Dam" dalam Jawi.', options: ['دام', 'دوم', 'ديم', 'دم'], answer: 'دم' }
+            ]},
+            { id: 205, title: 'Kuiz Asas 2: KVK Vokal A (Jawi ke Rumi) (Set 5)', type: 'custom', questions: [
+                { q: 'Perkataan "بس" dibaca sebagai?', options: ['Bas', 'Bis', 'Bus', 'Bos'], answer: 'Bas' },
+                { q: 'Perkataan "جم" dibaca sebagai?', options: ['Jam', 'Jum', 'Jim', 'Jom'], answer: 'Jam' },
+                { q: 'Perkataan "چت" dibaca sebagai?', options: ['Cat', 'Cit', 'Cut', 'Cot'], answer: 'Cat' },
+                { q: 'Perkataan "ڤم" dibaca sebagai?', options: ['Pam', 'Pim', 'Pum', 'Pom'], answer: 'Pam' },
+                { q: 'Perkataan "كاد" dibaca sebagai?', options: ['Kad', 'Kud', 'Kid', 'Kod'], answer: 'Kad' },
+                { q: 'Perkataan "ݢس" dibaca sebagai?', options: ['Gas', 'Gus', 'Gis', 'Gos'], answer: 'Gas' },
+                { q: 'Perkataan "تس" dibaca sebagai?', options: ['Tas', 'Tus', 'Tis', 'Tos'], answer: 'Tas' },
+                { q: 'Perkataan "ݢم" dibaca sebagai?', options: ['Gam', 'Gum', 'Gim', 'Gom'], answer: 'Gam' },
+                { q: 'Perkataan "لڤ" dibaca sebagai?', options: ['Lap', 'Lup', 'Lip', 'Lop'], answer: 'Lap' },
+                { q: 'Perkataan "ڤس" dibaca sebagai?', options: ['Pas', 'Pus', 'Pis', 'Pos'], answer: 'Pas' },
+                { q: 'Perkataan "چڤ" dibaca sebagai?', options: ['Cap', 'Cup', 'Cip', 'Cop'], answer: 'Cap' },
+                { q: 'Perkataan "واڠ" dibaca sebagai?', options: ['Wang', 'Wong', 'Wing', 'Wung'], answer: 'Wang' },
+                { q: 'Perkataan "واڤ" dibaca sebagai?', options: ['Wap', 'Wip', 'Wup', 'Wop'], answer: 'Wap' },
+                { q: 'Perkataan "ياڠ" dibaca sebagai?', options: ['Yang', 'Ying', 'Yung', 'Yong'], answer: 'Yang' },
+                { q: 'Perkataan "دان" dibaca sebagai?', options: ['Dan', 'Din', 'Dun', 'Don'], answer: 'Dan' },
+                { q: 'Perkataan "تر" dibaca sebagai?', options: ['Tar', 'Tur', 'Tir', 'Tor'], answer: 'Tar' },
+                { q: 'Perkataan "رق" dibaca sebagai?', options: ['Rak', 'Ruk', 'Rik', 'Rok'], answer: 'Rak' },
+                { q: 'Perkataan "ڤق" dibaca sebagai?', options: ['Pak', 'Puk', 'Pik', 'Pok'], answer: 'Pak' },
+                { q: 'Perkataan "چس" dibaca sebagai?', options: ['Cas', 'Cus', 'Cis', 'Cos'], answer: 'Cas' },
+                { q: 'Perkataan "دم" dibaca sebagai?', options: ['Dam', 'Dum', 'Dim', 'Dom'], answer: 'Dam' }
+            ]},
+            { id: 206, title: 'Kuiz Asas 2: Uji Minda Hukum KVK Vokal A (Set 6)', type: 'custom', questions: [
+                { q: 'Apakah hukum bagi suku kata tertutup (KVK) vokal "A" bagi perkataan Melayu jati?', options: ['Kekal Alif', 'Buang Alif', 'Tukar ke Wau', 'Tukar ke Ya'], answer: 'Buang Alif' },
+                { q: 'Pilih ejaan "Bas" yang betul.', options: ['باس', 'بس', 'بيس', 'بوس'], answer: 'بس' },
+                { q: 'Kenapa perkataan "Wap" dieja (واڤ) ada huruf Alif?', options: ['Sebab ia KVK', 'Sebab bermula dengan huruf Wau', 'Sebab ia pinjaman Inggeris', 'Semua di atas'], answer: 'Sebab bermula dengan huruf Wau' },
+                { q: 'Kenapa "Kad" dieja (كاد)?', options: ['Bermula huruf Wau', 'Kata Melayu Jati', 'Kata pinjaman Bahasa Inggeris', 'Tiada sebab'], answer: 'Kata pinjaman Bahasa Inggeris' },
+                { q: 'Kenapa perkataan "Yang" dieja (ياڠ)?', options: ['Bermula huruf Wau', 'Bermula huruf Ya', 'Pinjaman Arab', 'Pinjaman Inggeris'], answer: 'Bermula huruf Ya' },
+                { q: 'Antara berikut, perkataan manakah yang DIGUGURKAN Alif?', options: ['ڤم (Pam)', 'واڤ (Wap)', 'كاد (Kad)', 'دان (Dan)'], answer: 'ڤم (Pam)' },
+                { q: 'Antara berikut, perkataan manakah KEKAL Alif di tengahnya?', options: ['جم (Jam)', 'واڠ (Wang)', 'تس (Tas)', 'چت (Cat)'], answer: 'واڠ (Wang)' },
+                { q: 'Pilih pasangan ejaan yang SALAH.', options: ['Bas = بس', 'Kad = كד', 'Jam = جم', 'Wang = واڠ'], answer: 'Kad = كד' },
+                { q: 'Adakah perkataan "Bot" menggunakan hukum KVK vokal A?', options: ['Ya', 'Tidak, ia vokal O', 'Mungkin', 'Salah ejaan'], answer: 'Tidak, ia vokal O' },
+                { q: 'Manakah ejaan yang betul bagi "Rak"?', options: ['راك', 'ريک', 'رق', 'روك'], answer: 'رق' },
+                { q: 'Perkataan "Dan" (دان) dikekalkan Alif kerana?', options: ['Bermula Wau', 'Pinjaman Arab', 'Pengecualian / Tradisi', 'Pinjaman Inggeris'], answer: 'Pengecualian / Tradisi' },
+                { q: 'Jika K=ك, A=ا, M=م (KVK). Ejaan yang betul bagi "Kam"?', options: ['كام', 'كم', 'كيم', 'كوم'], answer: 'كم' },
+                { q: 'Pilih perkataan KVK Vokal A.', options: ['Buku', 'Meja', 'Jam', 'Topi'], answer: 'Jam' },
+                { q: 'Pilih perkataan yang BUKAN KVK Vokal A.', options: ['Bas', 'Kad', 'Pam', 'Tin'], answer: 'Tin' },
+                { q: 'Ejaan Jawi bagi "Gas"?', options: ['ݢاس', 'ݢس', 'ݢيس', 'ݢوس'], answer: 'ݢس' },
+                { q: 'Jika B-A-S = بس, maka P-A-S = ?', options: ['ڤاس', 'ڤس', 'ڤيس', 'ڤوس'], answer: 'ڤس' },
+                { q: 'Hukum Buang Alif terpakai untuk vokal apa sahaja?', options: ['A, I, U', 'A sahaja', 'I sahaja', 'U sahaja'], answer: 'A sahaja' },
+                { q: 'Kenal pasti ejaan yang SALAH.', options: ['چت (Cat)', 'ڤم (Pam)', 'باس (Bas)', 'جم (Jam)'], answer: 'باس (Bas)' },
+                { q: 'Eja "Cat" (KVK Melayu).', options: ['چات', 'چت', 'چيت', 'چوت'], answer: 'چت' },
+                { q: 'Manakah ejaan KVK yang betul?', options: ['ݢام (Gam)', 'تاس (Tas)', 'لڤ (Lap)', 'ڤاس (Pas)'], answer: 'لڤ (Lap)' }
+            ]}
+        ];
+
+        // --- STATE APP UTAMA ---
+        let state = {
+            currentUser: null,
+            activeTab: 'utama',
+            isMobileMenuOpen: false,
+            selectedQuizCategory: null, 
+            editingQuiz: null, // State untuk Quiz Builder
+            editingItem: null, // State untuk Edit Note/Exam
+            modal: { isOpen: false, type: '', payload: null, title: '', message: '', content: '' },
+            quizSession: { active: false, quizId: null, currentIndex: 0, score: 0 },
+            users: [], 
+            quizzes: [], 
+            notes: [], 
+            exams: []
         };
 
         // --- SISTEM RENDER UTAMA ---
@@ -399,7 +338,6 @@
         function renderLayout() {
             const isTeacher = state.currentUser.role === 'teacher';
             
-            // Menu Item Guru
             const teacherMenu = `
                 ${renderMenuItem('utama', 'Utama', 'fa-home')}
                 ${renderMenuItem('urus-nota', 'Urus Nota', 'fa-file-alt')}
@@ -409,7 +347,6 @@
                 ${renderMenuItem('urus-guru', 'Urus Pengguna', 'fa-users-cog')}
             `;
 
-            // Menu Item Murid
             const studentMenu = `
                 ${renderMenuItem('utama', 'Utama', 'fa-home')}
                 ${renderMenuItem('nota', 'Nota Jawi', 'fa-book')}
@@ -421,55 +358,37 @@
             const sidebarClass = state.isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0';
 
             return `
-                <!-- Sidebar -->
                 <aside class="fixed inset-y-0 left-0 z-50 w-64 bg-emerald-800 text-white shadow-xl sidebar-transition md:relative ${sidebarClass}">
                     <div class="flex items-center justify-between p-4 border-b border-emerald-700">
                         <div class="flex items-center gap-3">
                             <i class="fas fa-book-open text-2xl text-emerald-300"></i>
                             <span class="text-xl font-bold tracking-wider">SEMAT JAWI</span>
                         </div>
-                        <button onclick="handleAction('toggle-menu')" class="md:hidden text-emerald-300 hover:text-white">
-                            <i class="fas fa-times text-xl"></i>
-                        </button>
+                        <button onclick="handleAction('toggle-menu')" class="md:hidden text-emerald-300 hover:text-white"><i class="fas fa-times text-xl"></i></button>
                     </div>
                     <div class="p-4">
-                        <div class="bg-emerald-700 rounded-lg p-3 mb-6 flex items-center gap-3">
-                            <div class="bg-emerald-600 p-2 rounded-full">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm font-bold truncate">${state.currentUser.name}</p>
-                                <p class="text-xs text-emerald-300">${isTeacher ? 'Admin/Guru' : 'Murid'}</p>
+                        <div class="bg-emerald-700 rounded-lg p-3 mb-6 flex items-center gap-3 overflow-hidden">
+                            <div class="bg-emerald-600 p-2 rounded-full shrink-0"><i class="fas fa-user"></i></div>
+                            <div class="min-w-0 flex-1">
+                                <p class="text-sm font-bold truncate block" title="${state.currentUser.name}">${state.currentUser.name}</p>
+                                <p class="text-xs text-emerald-300 truncate">${isTeacher ? 'Admin/Guru' : 'Murid'}</p>
                             </div>
                         </div>
-                        <nav class="space-y-2">
-                            ${isTeacher ? teacherMenu : studentMenu}
-                        </nav>
+                        <nav class="space-y-2">${isTeacher ? teacherMenu : studentMenu}</nav>
                     </div>
                     <div class="absolute bottom-0 w-full p-4 border-t border-emerald-700">
-                        <button onclick="handleAction('logout')" class="w-full flex items-center gap-3 px-4 py-2 text-emerald-200 hover:text-white hover:bg-emerald-700 rounded-lg transition-colors">
-                            <i class="fas fa-sign-out-alt"></i> Log Keluar
-                        </button>
+                        <button onclick="handleAction('logout')" class="w-full flex items-center gap-3 px-4 py-2 text-emerald-200 hover:text-white hover:bg-emerald-700 rounded-lg transition-colors"><i class="fas fa-sign-out-alt"></i> Log Keluar</button>
                     </div>
                 </aside>
 
-                <!-- Overlay for mobile menu -->
                 ${state.isMobileMenuOpen ? `<div onclick="handleAction('toggle-menu')" class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"></div>` : ''}
 
-                <!-- Main Content -->
-                <main class="flex-1 flex flex-col min-w-0 bg-gray-50 h-screen overflow-y-auto">
-                    <!-- Top header mobile -->
+                <main class="flex-1 flex flex-col min-w-0 bg-gray-50 h-screen overflow-y-auto relative">
                     <header class="md:hidden bg-white shadow-sm p-4 flex justify-between items-center sticky top-0 z-30">
-                        <div class="flex items-center gap-2 text-emerald-700">
-                            <i class="fas fa-book-open"></i>
-                            <span class="font-bold">Semat Jawi</span>
-                        </div>
-                        <button onclick="handleAction('toggle-menu')" class="text-gray-600 hover:text-emerald-700 text-xl p-2">
-                            <i class="fas fa-bars"></i>
-                        </button>
+                        <div class="flex items-center gap-2 text-emerald-700"><i class="fas fa-book-open"></i><span class="font-bold">Semat Jawi</span></div>
+                        <button onclick="handleAction('toggle-menu')" class="text-gray-600 hover:text-emerald-700 text-xl p-2"><i class="fas fa-bars"></i></button>
                     </header>
-                    
-                    <div class="p-6 md:p-8">
+                    <div class="p-6 md:p-8 relative">
                         ${renderActiveContent(isTeacher)}
                     </div>
                 </main>
@@ -491,7 +410,24 @@
         function renderModal() {
             if (!state.modal.isOpen) return '';
             
-            // Pop-up untuk Padam Rekod
+            if (state.modal.type === 'view-details') {
+                return `
+                <div class="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
+                    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+                        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                            <h3 class="text-xl font-bold text-gray-800"><i class="fas fa-info-circle text-blue-500 mr-2"></i>${state.modal.title}</h3>
+                            <button onclick="handleAction('close-modal')" class="text-gray-400 hover:text-red-500 transition-colors"><i class="fas fa-times text-xl"></i></button>
+                        </div>
+                        <div class="p-6 overflow-y-auto custom-scrollbar">
+                            ${state.modal.content}
+                        </div>
+                        <div class="p-4 border-t border-gray-100 bg-gray-50 text-right">
+                            <button onclick="handleAction('close-modal')" class="px-6 py-2 bg-gray-800 text-white hover:bg-black rounded-lg font-bold transition-colors">Tutup</button>
+                        </div>
+                    </div>
+                </div>`;
+            }
+
             if (state.modal.type === 'confirm-delete-user' || state.modal.type === 'confirm-delete-note' || state.modal.type === 'confirm-delete-exam' || state.modal.type === 'confirm-delete-quiz') {
                 return `
                 <div class="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
@@ -506,7 +442,6 @@
                 </div>`;
             }
 
-            // Pop-up Guru: Kemaskini Peratusan Prestasi Murid
             if (state.modal.type === 'update-progress') {
                 const student = state.users.find(u => u.id === state.modal.payload);
                 return `
@@ -526,7 +461,6 @@
                 </div>`;
             }
 
-            // Pop-up Guru: Lihat Rekod Markah Murid
             if (state.modal.type === 'view-records') {
                 const student = state.users.find(u => u.id === state.modal.payload);
                 const recordsHtml = (student.records && student.records.length > 0) ? student.records.map(r => `
@@ -557,14 +491,11 @@
                 </div>`;
             }
             
-            // Pop-up Makluman/Berjaya (ganti alert biasa)
             if (state.modal.type === 'alert') {
                 return `
                 <div class="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
                     <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full text-center">
-                        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
+                        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl"><i class="fas fa-check-circle"></i></div>
                         <h3 class="text-xl font-bold text-gray-800 mb-2">${state.modal.title}</h3>
                         <p class="text-gray-600 mb-6">${state.modal.message}</p>
                         <button onclick="handleAction('close-modal')" class="w-full px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-lg font-bold transition-colors">Tutup</button>
@@ -630,46 +561,61 @@
         }
 
         function renderTeacherUrusNota() {
+            const isEditing = state.editingItem && state.editingItem.model === 'note';
+            const editData = isEditing ? state.editingItem.data : { title: '', type: 'text', content: '' };
+            
             let notesList = state.notes.map(n => `
-                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 flex justify-between items-start">
-                    <div>
-                        <span class="text-xs font-bold bg-gray-200 text-gray-700 px-2 py-1 rounded uppercase mb-2 inline-block">${n.type}</span>
-                        <h4 class="font-bold text-gray-800">${n.title}</h4>
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col gap-3">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs font-bold bg-gray-200 text-gray-700 px-2 py-1 rounded uppercase mb-2 inline-block">${n.type}</span>
+                            <h4 class="font-bold text-gray-800 leading-tight">${n.title}</h4>
+                        </div>
+                        <div class="flex gap-1">
+                            <button onclick="handleAction('view-note-details', ${n.id})" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm text-xs font-bold" title="Lihat Kandungan"><i class="fas fa-eye"></i></button>
+                            <button onclick="handleAction('edit-note', ${n.id})" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded shadow-sm text-xs font-bold" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button onclick="handleAction('delete-note', ${n.id})" class="bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded shadow-sm text-xs font-bold" title="Padam"><i class="fas fa-trash"></i></button>
+                        </div>
                     </div>
-                    <button onclick="handleAction('delete-note', ${n.id})" class="text-red-500 hover:bg-red-50 p-2 rounded"><i class="fas fa-trash"></i></button>
                 </div>
             `).join('');
 
             return `
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">Urus Nota Jawi</h2>
                 <div class="grid md:grid-cols-2 gap-8">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="font-bold text-lg mb-4 text-emerald-800">Muat Naik Nota Baru</h3>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border ${isEditing ? 'border-yellow-400 bg-yellow-50/30' : 'border-gray-100'}">
+                        <div class="flex justify-between items-center mb-4 border-b pb-2">
+                            <h3 class="font-bold text-lg text-emerald-800">${isEditing ? '<i class="fas fa-edit text-yellow-500 mr-2"></i>Kemaskini Nota' : 'Muat Naik Nota Baru'}</h3>
+                            ${isEditing ? `<button onclick="handleAction('cancel-edit')" class="text-xs font-bold text-red-500 hover:underline">Batal Edit</button>` : ''}
+                        </div>
                         <form onsubmit="handleFormSubmit(event, 'add-note')" class="space-y-4">
+                            ${isEditing ? `<input type="hidden" name="id" value="${editData.id}">` : ''}
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Tajuk Nota</label>
-                                <input type="text" name="title" required class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500">
+                                <input type="text" name="title" value="${editData.title.replace(/"/g, '&quot;')}" required class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Bahan</label>
                                 <select name="type" required class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500">
-                                    <option value="text">Teks / Jawi Biasa</option>
-                                    <option value="html">Format Khas (HTML)</option>
-                                    <option value="youtube">Pautan YouTube</option>
-                                    <option value="drive">Pautan Google Drive</option>
-                                    <option value="embed">Embed Kod HTML</option>
+                                    <option value="text" ${editData.type==='text'?'selected':''}>Teks / Jawi Biasa</option>
+                                    <option value="html" ${editData.type==='html'?'selected':''}>Format Khas (HTML)</option>
+                                    <option value="youtube" ${editData.type==='youtube'?'selected':''}>Pautan YouTube</option>
+                                    <option value="drive" ${editData.type==='drive'?'selected':''}>Pautan Google Drive</option>
+                                    <option value="embed" ${editData.type==='embed'?'selected':''}>Embed Kod HTML</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Kandungan / Pautan / Kod</label>
-                                <textarea name="content" required rows="4" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500" placeholder="Masukkan teks, pautan atau kod iframe..."></textarea>
+                                <textarea name="content" required rows="6" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500 font-mono text-sm" placeholder="Masukkan teks, pautan atau kod iframe...">${editData.content}</textarea>
                             </div>
-                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-bold">Simpan Bahan</button>
+                            <button type="submit" class="w-full ${isEditing ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-emerald-600 hover:bg-emerald-700'} text-white py-2 rounded-lg font-bold">
+                                ${isEditing ? 'Simpan Perubahan' : 'Simpan Bahan'}
+                            </button>
                         </form>
                     </div>
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="font-bold text-lg mb-4 text-emerald-800">Senarai Nota</h3>
-                        <div class="space-y-3">
+                        <h3 class="font-bold text-lg mb-4 text-emerald-800 border-b pb-2">Senarai Nota Terbitan</h3>
+                        <div class="space-y-3 h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                             ${notesList || '<p class="text-gray-500 text-sm">Belum ada nota.</p>'}
                         </div>
                     </div>
@@ -677,85 +623,138 @@
             `;
         }
 
-        function renderTeacherUrusKuiz() {
-            let quizzesList = state.quizzes.map(q => `
-                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 flex justify-between items-start mb-3">
-                    <div>
-                        <span class="text-xs font-bold bg-gray-200 text-gray-700 px-2 py-1 rounded uppercase mb-2 inline-block">${q.type}</span>
-                        <h4 class="font-bold text-gray-800">${q.title}</h4>
+        // ==========================================
+        // QUIZ BUILDER UI (UNTUK GURU)
+        // ==========================================
+        function renderQuizEditor() {
+            let eq = state.editingQuiz;
+            let questionsHtml = eq.questions.map((q, qIndex) => `
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 relative mb-4">
+                    <button type="button" onclick="handleAction('remove-question', ${qIndex})" class="absolute top-2 right-2 text-red-400 hover:text-red-600"><i class="fas fa-times-circle text-xl"></i></button>
+                    <p class="font-bold text-emerald-800 mb-2">Soalan ${qIndex + 1}</p>
+                    <input type="text" value="${q.q}" onchange="handleAction('update-question', {qIndex: ${qIndex}, field: 'q', value: this.value})" class="w-full border p-2 rounded mb-3 font-bold" placeholder="Taip soalan di sini...">
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        ${q.options.map((opt, oIndex) => `
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-gray-400 w-4">${oIndex+1}.</span>
+                                <input type="text" value="${opt}" onchange="handleAction('update-question', {qIndex: ${qIndex}, field: 'opt', optIndex: ${oIndex}, value: this.value})" class="w-full border p-2 rounded text-sm ${q.answer && q.answer === opt && opt !== '' ? 'border-green-500 bg-green-50' : ''}" placeholder="Pilihan ${oIndex+1}">
+                            </div>
+                        `).join('')}
                     </div>
-                    <button onclick="handleAction('delete-quiz', ${q.id})" class="text-red-500 hover:bg-red-50 p-2 rounded"><i class="fas fa-trash"></i></button>
+                    <div>
+                        <label class="text-xs font-bold text-gray-500">Jawapan Tepat:</label>
+                        <select onchange="handleAction('update-question', {qIndex: ${qIndex}, field: 'answer', value: this.value})" class="w-full border p-2 rounded text-sm bg-green-50 text-green-800 font-bold outline-none">
+                            <option value="">-- Pilih Jawapan Tepat --</option>
+                            ${q.options.filter(o => o.trim() !== '').map(opt => `<option value="${opt}" ${q.answer === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                        </select>
+                    </div>
                 </div>
             `).join('');
 
             return `
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">Urus Kuiz (Latihan)</h2>
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-6">
-                        <div>
-                            <h3 class="font-bold text-lg mb-2 text-emerald-800"><i class="fas fa-file-csv mr-2 text-blue-500"></i>Muat Naik CSV</h3>
-                            <p class="text-sm text-gray-500 mb-3">Muat naik soalan secara pukal menggunakan fail CSV.</p>
-                            <input type="file" accept=".csv" class="mb-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
-                            <button onclick="handleAction('mock-upload', 'CSV Kuiz berjaya dimuat naik!')" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">Muat Naik CSV</button>
-                        </div>
-                        <hr>
-                        <div>
-                            <h3 class="font-bold text-lg mb-2 text-emerald-800"><i class="fas fa-code mr-2 text-orange-500"></i>Embed HTML Kuiz</h3>
-                            <p class="text-sm text-gray-500 mb-3">Masukkan kod iframe dari platform seperti Wordwall, Quizizz atau Blooket.</p>
-                            <form onsubmit="handleFormSubmit(event, 'add-quiz')">
-                                <input type="text" name="title" required placeholder="Tajuk Kuiz" class="w-full border border-gray-300 rounded-lg p-2 mb-2 text-sm">
-                                <textarea name="content" required rows="3" class="w-full border border-gray-300 rounded-lg p-2 mb-2 text-sm" placeholder='<iframe src="..."></iframe>'></textarea>
-                                <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded text-sm hover:bg-orange-600">Simpan Embed</button>
-                            </form>
-                        </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-purple-200 w-full max-w-4xl mx-auto">
+                    <div class="flex justify-between items-center mb-6 border-b pb-4">
+                        <h2 class="text-2xl font-bold text-purple-800"><i class="fas fa-tools mr-2"></i>Pembina Kuiz (Quiz Builder)</h2>
+                        <button onclick="handleAction('cancel-quiz-edit')" class="text-gray-500 hover:text-red-500 font-bold"><i class="fas fa-times mr-1"></i> Batal</button>
                     </div>
                     
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="font-bold text-lg mb-4 text-emerald-800">Senarai Kuiz</h3>
-                        <div class="space-y-3">
-                            ${quizzesList || '<p class="text-gray-500 text-sm">Belum ada kuiz.</p>'}
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Tajuk Kuiz / Modul</label>
+                        <input type="text" value="${eq.title}" onchange="handleAction('update-quiz-title', this.value)" class="w-full border-2 border-gray-300 rounded-lg p-3 text-lg font-bold focus:border-purple-500 outline-none" placeholder="Contoh: Kuiz Latihan Jawi Tahap 1">
+                    </div>
+                    
+                    <div class="mb-4 flex justify-between items-center bg-purple-50 p-3 rounded-lg border border-purple-100">
+                        <h3 class="font-bold text-purple-800">Senarai Soalan (${eq.questions.length})</h3>
+                        <button onclick="handleAction('add-question')" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded text-sm font-bold shadow-sm"><i class="fas fa-plus mr-1"></i> Tambah Soalan</button>
+                    </div>
+                    
+                    <div class="max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar space-y-2 mb-6">
+                        ${questionsHtml || '<div class="text-center p-8 border-2 border-dashed border-gray-200 rounded-xl text-gray-400">Belum ada soalan dibina. Klik Tambah Soalan.</div>'}
+                    </div>
+
+                    <button onclick="handleAction('save-quiz')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg transition-all"><i class="fas fa-save mr-2"></i> Simpan Modul Kuiz Ini</button>
+                </div>
+            `;
+        }
+
+        function renderTeacherUrusKuiz() {
+            if (state.editingQuiz) return renderQuizEditor();
+
+            let quizzesList = state.quizzes.map(q => `
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col gap-3">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs font-bold ${q.id < 1000 ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'} px-2 py-1 rounded uppercase mb-2 inline-block">${q.id < 1000 ? 'Modul KPM (Sistem)' : 'Modul Custom Guru'}</span>
+                            <h4 class="font-bold text-gray-800 leading-tight">${q.title}</h4>
+                            <p class="text-sm text-gray-500 mt-1"><i class="fas fa-list-ol mr-1"></i>${q.questions ? q.questions.length + ' Soalan' : 'Kuiz Embed'}</p>
                         </div>
+                        <div class="flex gap-1">
+                            <button onclick="handleAction('view-quiz-details', ${q.id})" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm text-xs font-bold" title="Lihat Soalan"><i class="fas fa-eye"></i></button>
+                            <button onclick="handleAction('edit-quiz', ${q.id})" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded shadow-sm text-xs font-bold" title="Edit Modul"><i class="fas fa-edit"></i></button>
+                            <button onclick="handleAction('delete-quiz', ${q.id})" class="bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded shadow-sm text-xs font-bold" title="Padam"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Modul Kuiz (Latihan)</h2>
+                    <button onclick="handleAction('create-new-quiz')" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-purple-700 shadow-sm transition-colors"><i class="fas fa-magic mr-2"></i>Bina Kuiz Baru</button>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-lg mb-4 text-emerald-800 border-b pb-2">Pengurusan Pangkalan Data Kuiz</h3>
+                    <div class="space-y-3 h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                        ${quizzesList || '<p class="text-gray-500 text-sm">Sistem sedang memuatkan kuiz...</p>'}
                     </div>
                 </div>
             `;
         }
 
         function renderTeacherUrusUjian() {
+            const isEditing = state.editingItem && state.editingItem.model === 'exam';
+            const editData = isEditing ? state.editingItem.data : { title: '', content: '' };
+
             let examsList = state.exams.map(e => `
-                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 flex justify-between items-start mb-3">
-                    <div>
-                        <span class="text-xs font-bold bg-gray-200 text-gray-700 px-2 py-1 rounded uppercase mb-2 inline-block">${e.type}</span>
-                        <h4 class="font-bold text-gray-800">${e.title}</h4>
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col gap-3">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs font-bold bg-gray-200 text-gray-700 px-2 py-1 rounded uppercase mb-2 inline-block">${e.type}</span>
+                            <h4 class="font-bold text-gray-800">${e.title}</h4>
+                        </div>
+                        <div class="flex gap-1">
+                            <button onclick="handleAction('view-exam-details', ${e.id})" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded shadow-sm text-xs font-bold" title="Lihat"><i class="fas fa-eye"></i></button>
+                            <button onclick="handleAction('edit-exam', ${e.id})" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded shadow-sm text-xs font-bold" title="Edit"><i class="fas fa-edit"></i></button>
+                            <button onclick="handleAction('delete-exam', ${e.id})" class="bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded shadow-sm text-xs font-bold" title="Padam"><i class="fas fa-trash"></i></button>
+                        </div>
                     </div>
-                    <button onclick="handleAction('delete-exam', ${e.id})" class="text-red-500 hover:bg-red-50 p-2 rounded"><i class="fas fa-trash"></i></button>
                 </div>
             `).join('');
 
             return `
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">Urus Ujian / Pentaksiran</h2>
                 <div class="grid md:grid-cols-2 gap-8">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border ${isEditing ? 'border-yellow-400 bg-yellow-50/30' : 'border-gray-100'} space-y-6">
                         <div>
-                            <h3 class="font-bold text-lg mb-2 text-emerald-800"><i class="fas fa-file-csv mr-2 text-blue-500"></i>Muat Naik CSV Ujian</h3>
-                            <p class="text-sm text-gray-500 mb-3">Muat naik soalan ujian pukal menggunakan fail CSV.</p>
-                            <input type="file" accept=".csv" class="mb-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
-                            <button onclick="handleAction('mock-upload', 'CSV Ujian berjaya dimuat naik!')" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">Muat Naik CSV</button>
-                        </div>
-                        <hr>
-                        <div>
-                            <h3 class="font-bold text-lg mb-2 text-emerald-800"><i class="fas fa-code mr-2 text-orange-500"></i>Embed HTML / Google Form</h3>
+                            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                                <h3 class="font-bold text-lg text-emerald-800">${isEditing ? '<i class="fas fa-edit text-yellow-500 mr-2"></i>Kemaskini Ujian' : '<i class="fas fa-code mr-2 text-orange-500"></i>Embed HTML / Google Form'}</h3>
+                                ${isEditing ? `<button onclick="handleAction('cancel-edit')" class="text-xs font-bold text-red-500 hover:underline">Batal Edit</button>` : ''}
+                            </div>
                             <p class="text-sm text-gray-500 mb-4">Masukkan kod iframe dari Google Form atau platform lain.</p>
                             <form onsubmit="handleFormSubmit(event, 'add-exam')">
-                                <input type="text" name="title" required placeholder="Tajuk Ujian (Cth: Ujian Penggal 1)" class="w-full border border-gray-300 rounded-lg p-2 mb-3 text-sm">
-                                <textarea name="content" required rows="4" placeholder="Letakkan kod <iframe src='...'> di sini" class="w-full border border-gray-300 rounded-lg p-2 mb-3 text-sm"></textarea>
-                                <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-bold text-sm">Terbitkan Ujian</button>
+                                ${isEditing ? `<input type="hidden" name="id" value="${editData.id}">` : ''}
+                                <input type="text" name="title" value="${editData.title.replace(/"/g, '&quot;')}" required placeholder="Tajuk Ujian (Cth: Ujian Penggal 1)" class="w-full border border-gray-300 rounded-lg p-2 mb-3 text-sm">
+                                <textarea name="content" required rows="6" placeholder="Letakkan kod <iframe src='...'> di sini" class="w-full border border-gray-300 rounded-lg p-2 mb-3 text-sm font-mono">${editData.content}</textarea>
+                                <button type="submit" class="w-full ${isEditing ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-emerald-600 hover:bg-emerald-700'} text-white py-2 rounded-lg font-bold shadow-sm">
+                                    ${isEditing ? 'Simpan Perubahan' : 'Terbitkan Ujian'}
+                                </button>
                             </form>
                         </div>
                     </div>
 
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <h3 class="font-bold text-lg mb-4 text-emerald-800">Senarai Ujian</h3>
-                        <div class="space-y-3">
+                        <h3 class="font-bold text-lg mb-4 text-emerald-800 border-b pb-2">Senarai Ujian</h3>
+                        <div class="space-y-3 h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                             ${examsList || '<p class="text-gray-500 text-sm">Belum ada ujian.</p>'}
                         </div>
                     </div>
@@ -809,11 +808,11 @@
         function renderTeacherUrusPengguna() {
             let usersList = state.users.map(u => `
                 <div class="flex justify-between items-center p-3 border-b border-gray-100">
-                    <div>
-                        <span class="font-bold">${u.name}</span> <span class="text-xs text-gray-500 bg-gray-100 px-2 rounded ml-2 uppercase">${u.role}</span>
-                        <p class="text-xs text-gray-500 mt-1"><i class="fas fa-envelope mr-1"></i>${u.email || 'Tiada E-mel'}</p>
+                    <div class="min-w-0 flex-1 pr-2">
+                        <span class="font-bold truncate block">${u.name}</span> <span class="text-xs text-gray-500 bg-gray-100 px-2 rounded uppercase inline-block">${u.role}</span>
+                        <p class="text-xs text-gray-500 mt-1 truncate"><i class="fas fa-envelope mr-1"></i>${u.email || 'Tiada E-mel'}</p>
                     </div>
-                    ${u.id !== state.currentUser.id ? `<button onclick="handleAction('delete-user', ${u.id})" class="text-red-500 hover:text-red-700 p-2"><i class="fas fa-user-minus"></i></button>` : '<span class="text-xs text-emerald-500">Anda</span>'}
+                    ${u.id !== state.currentUser.id ? `<button onclick="handleAction('delete-user', ${u.id})" class="text-red-500 hover:text-red-700 p-2 shrink-0"><i class="fas fa-user-minus"></i></button>` : '<span class="text-xs text-emerald-500 shrink-0">Anda</span>'}
                 </div>
             `).join('');
 
@@ -843,7 +842,7 @@
                     </div>
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <h3 class="font-bold text-lg mb-4 text-emerald-800">Senarai Pengguna Berdaftar</h3>
-                        <div class="h-96 overflow-y-auto pr-2">
+                        <div class="h-96 overflow-y-auto pr-2 custom-scrollbar">
                             ${usersList || '<p class="text-gray-500 text-sm">Tiada pengguna didaftarkan.</p>'}
                         </div>
                     </div>
@@ -1100,12 +1099,16 @@
                         state.isMobileMenuOpen = false;
                         state.quizSession.active = false;
                         state.selectedQuizCategory = null;
+                        state.editingItem = null;
+                        state.editingQuiz = null;
                         render();
                     });
                     break;
                 case 'switch-tab':
                     state.activeTab = payload;
                     state.isMobileMenuOpen = false; // close mobile menu on click
+                    state.editingItem = null;
+                    state.editingQuiz = null;
                     if(payload === 'kuiz') state.selectedQuizCategory = null; // Kembali ke menu kategori bila klik tab kuiz
                     render();
                     break;
@@ -1121,6 +1124,109 @@
                     state.isMobileMenuOpen = !state.isMobileMenuOpen;
                     render();
                     break;
+                
+                // --- PENGURUSAN EDIT/KANDUNGAN (GURU) ---
+                case 'view-note-details': {
+                    const note = state.notes.find(n => n.id === payload);
+                    if(note){
+                        let cHtml = note.type === 'html' ? note.content : (note.type === 'text' ? `<p class="font-jawi text-right text-lg">${note.content}</p>` : `<pre class="text-sm bg-gray-100 p-4 rounded">${note.content}</pre>`);
+                        state.modal = { isOpen: true, type: 'view-details', title: `Nota: ${note.title}`, content: cHtml };
+                        render();
+                    }
+                    break;
+                }
+                case 'view-exam-details': {
+                    const exm = state.exams.find(e => e.id === payload);
+                    if(exm){
+                        state.modal = { isOpen: true, type: 'view-details', title: `Ujian: ${exm.title}`, content: `<div class="w-full overflow-hidden rounded-lg">${exm.content}</div>` };
+                        render();
+                    }
+                    break;
+                }
+                case 'view-quiz-details': {
+                    const qz = state.quizzes.find(q => q.id === payload);
+                    if(qz){
+                        let content = '';
+                        if(qz.type === 'embed') {
+                            content = `<div class="w-full overflow-hidden rounded-lg">${qz.content}</div>`;
+                        } else {
+                            content = qz.questions.map((qs, i) => `
+                                <div class="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                                    <p class="font-bold text-gray-800 mb-2">${i+1}. ${qs.q}</p>
+                                    <ul class="text-sm space-y-1 mb-2 font-jawi text-gray-600">
+                                        ${qs.options.map(opt => `<li>- ${opt}</li>`).join('')}
+                                    </ul>
+                                    <p class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2 py-1 rounded inline-block">Jawapan: ${qs.answer}</p>
+                                </div>
+                            `).join('');
+                        }
+                        state.modal = { isOpen: true, type: 'view-details', title: `Kuiz: ${qz.title}`, content: content };
+                        render();
+                    }
+                    break;
+                }
+                case 'edit-note':
+                    state.editingItem = { model: 'note', data: state.notes.find(n => n.id === payload) };
+                    window.scrollTo(0,0);
+                    render();
+                    break;
+                case 'edit-exam':
+                    state.editingItem = { model: 'exam', data: state.exams.find(e => e.id === payload) };
+                    window.scrollTo(0,0);
+                    render();
+                    break;
+                case 'cancel-edit':
+                    state.editingItem = null;
+                    render();
+                    break;
+                
+                // --- QUIZ BUILDER ---
+                case 'create-new-quiz':
+                    state.editingQuiz = { id: Date.now(), title: '', type: 'custom', questions: [] };
+                    render();
+                    break;
+                case 'edit-quiz':
+                    state.editingQuiz = JSON.parse(JSON.stringify(state.quizzes.find(q => q.id === payload)));
+                    render();
+                    break;
+                case 'cancel-quiz-edit':
+                    state.editingQuiz = null;
+                    render();
+                    break;
+                case 'update-quiz-title':
+                    if(state.editingQuiz) state.editingQuiz.title = payload;
+                    break;
+                case 'add-question':
+                    state.editingQuiz.questions.push({ q: '', options: ['', '', '', ''], answer: '' });
+                    render();
+                    break;
+                case 'remove-question':
+                    state.editingQuiz.questions.splice(payload, 1);
+                    render();
+                    break;
+                case 'update-question':
+                    // payload: {qIndex, field, optIndex, value}
+                    let question = state.editingQuiz.questions[payload.qIndex];
+                    if(payload.field === 'q') question.q = payload.value;
+                    else if(payload.field === 'answer') question.answer = payload.value;
+                    else if(payload.field === 'opt') question.options[payload.optIndex] = payload.value;
+                    render();
+                    break;
+                case 'save-quiz':
+                    if(!state.editingQuiz.title) return alert("Sila masukkan tajuk kuiz.");
+                    if(state.editingQuiz.questions.length === 0) return alert("Sila letak sekurang-kurangnya 1 soalan.");
+                    
+                    let existQIndex = state.quizzes.findIndex(q => q.id === state.editingQuiz.id);
+                    if(existQIndex >= 0) state.quizzes[existQIndex] = state.editingQuiz;
+                    else state.quizzes.push(state.editingQuiz);
+                    
+                    state.editingQuiz = null;
+                    saveState();
+                    state.modal = { isOpen: true, type: 'alert', title: 'Berjaya', message: 'Modul kuiz telah dikemas kini dan disimpan.' };
+                    render();
+                    break;
+
+                // --- FUNGSI SEDIA ADA ---
                 case 'start-quiz':
                     state.quizSession = { active: true, quizId: payload, currentIndex: 0, score: 0 };
                     render();
@@ -1200,7 +1306,7 @@
                     render();
                     break;
                 case 'delete-quiz':
-                    state.modal = { isOpen: true, type: 'confirm-delete-quiz', payload: payload, title: 'Padam Kuiz', message: 'Adakah anda pasti mahu memadam kuiz ini?' };
+                    state.modal = { isOpen: true, type: 'confirm-delete-quiz', payload: payload, title: 'Padam Kuiz', message: 'Adakah anda pasti mahu memadam kuiz ini secara kekal?' };
                     render();
                     break;
                 case 'close-modal':
@@ -1257,7 +1363,7 @@
                     id: Date.now(),
                     role: formData.get('role'),
                     name: formData.get('name'),
-                    email: formData.get('email').toLowerCase(), // Simpan emel murid/guru
+                    email: formData.get('email').toLowerCase(),
                     stars: formData.get('role') === 'student' ? 0 : undefined,
                     progress: formData.get('role') === 'student' ? 0 : undefined,
                     records: formData.get('role') === 'student' ? [] : undefined
@@ -1268,37 +1374,30 @@
             else if (formType === 'add-note') {
                 let content = formData.get('content');
                 const type = formData.get('type');
+                const id = formData.get('id') ? parseInt(formData.get('id')) : Date.now();
                 
-                // Helper to fix Youtube URL for iframe
                 if (type === 'youtube' && content.includes('watch?v=')) {
                     content = content.replace('watch?v=', 'embed/');
                 }
 
-                state.notes.push({
-                    id: Date.now(),
-                    title: formData.get('title'),
-                    type: type,
-                    content: content
-                });
-                state.modal = { isOpen: true, type: 'alert', title: 'Berjaya', message: 'Nota baru telah disimpan.' };
-            }
-            else if (formType === 'add-quiz') {
-                state.quizzes.push({
-                    id: Date.now(),
-                    title: formData.get('title'),
-                    type: 'embed',
-                    content: formData.get('content')
-                });
-                state.modal = { isOpen: true, type: 'alert', title: 'Berjaya', message: 'Kuiz baru berjaya ditambah.' };
+                const newNote = { id, title: formData.get('title'), type, content };
+                const existIdx = state.notes.findIndex(n => n.id === id);
+                if(existIdx >= 0) state.notes[existIdx] = newNote;
+                else state.notes.push(newNote);
+                
+                state.editingItem = null;
+                state.modal = { isOpen: true, type: 'alert', title: 'Berjaya', message: 'Nota telah disimpan.' };
             }
             else if (formType === 'add-exam') {
-                state.exams.push({
-                    id: Date.now(),
-                    title: formData.get('title'),
-                    type: 'embed',
-                    content: formData.get('content')
-                });
-                state.modal = { isOpen: true, type: 'alert', title: 'Berjaya', message: 'Ujian baru berjaya ditambah.' };
+                const id = formData.get('id') ? parseInt(formData.get('id')) : Date.now();
+                const newExam = { id, title: formData.get('title'), type: 'embed', content: formData.get('content') };
+                
+                const existIdx = state.exams.findIndex(e => e.id === id);
+                if(existIdx >= 0) state.exams[existIdx] = newExam;
+                else state.exams.push(newExam);
+                
+                state.editingItem = null;
+                state.modal = { isOpen: true, type: 'alert', title: 'Berjaya', message: 'Ujian telah disimpan.' };
             }
 
             e.target.reset();
@@ -1310,11 +1409,13 @@
         async function saveState() {
             if (!auth.currentUser) return;
             try {
+                // Semua perubahan kini ditulis semula ke DB sepenuhnya
                 await setDoc(docRef, {
                     users: state.users,
                     notes: state.notes,
                     quizzes: state.quizzes,
-                    exams: state.exams
+                    exams: state.exams,
+                    seedVersion: SEED_VERSION // Rekod versi supaya sistem tau ia update terbaru
                 });
             } catch (error) {
                 console.error("Gagal simpan ke Firestore:", error);
@@ -1326,23 +1427,29 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 // Pengguna telah log masuk Google, dengar data Firestore
-                unsubscribeSnapshot = onSnapshot(docRef, (docSnap) => {
+                unsubscribeSnapshot = onSnapshot(docRef, async (docSnap) => {
                     let parsed = docSnap.exists() ? docSnap.data() : null;
 
-                    if (!parsed) {
-                        // Jika DB kosong (Sistem Baru Mula)
-                        parsed = {
-                            users: [],
-                            notes: state.notes, // Kekalkan default nota & kuiz
-                            quizzes: state.quizzes,
-                            exams: state.exams
-                        };
+                    // Semak jika Pangkalan Data Kosong ATAU Versi Terlalu Lama (Perlu Force Update Modul KPM)
+                    if (!parsed || parsed.seedVersion !== SEED_VERSION) {
+                        console.log("Memuatnaik modul sistem KPM terkini...");
+                        // Kekalkan nota/kuiz tambahan guru (ID > 10000)
+                        let customNotes = parsed && parsed.notes ? parsed.notes.filter(n => n.id > 10000) : [];
+                        let customQuizzes = parsed && parsed.quizzes ? parsed.quizzes.filter(q => q.id > 10000) : [];
+                        
+                        state.notes = [...SYSTEM_NOTES, ...customNotes];
+                        state.quizzes = [...SYSTEM_QUIZZES, ...customQuizzes];
+                        state.exams = parsed && parsed.exams ? parsed.exams : state.exams;
+                        state.users = parsed && parsed.users ? parsed.users : [];
+                        
+                        // Selepas log masuk pertama sebagai admin, fungsi saveState() di bawah akan memateri data ini dalam DB.
+                    } else {
+                        // Data DB adalah versi selari. Guna data DB sepenuhnya.
+                        state.notes = parsed.notes || [];
+                        state.quizzes = parsed.quizzes || [];
+                        state.exams = parsed.exams || [];
+                        state.users = parsed.users || [];
                     }
-
-                    state.notes = parsed.notes || [];
-                    state.quizzes = parsed.quizzes || [];
-                    state.exams = parsed.exams || [];
-                    state.users = parsed.users || [];
 
                     // Penyeragaman E-mel kepada huruf kecil untuk mengelakkan ralat "Case-Sensitive"
                     const userEmail = user.email ? user.email.toLowerCase() : '';
@@ -1362,7 +1469,7 @@
                                 email: userEmail
                             };
                             state.users.push(sjUser);
-                            saveState(); // Menyimpan guru ini ke Firestore
+                            await saveState(); // Menyimpan guru ini dan modul KPM ke Firestore
                             
                             // Tetapkan sesi semasa dan papar
                             state.currentUser = sjUser;
@@ -1385,6 +1492,13 @@
 
                     // Jika pengguna sudah wujud dalam Whitelist, Log masuk berjaya
                     state.currentUser = sjUser;
+                    
+                    // Update current user name if Google name changed
+                    if(user.displayName && sjUser.name !== user.displayName){
+                         sjUser.name = user.displayName;
+                         saveState();
+                    }
+
                     render();
                 }, (error) => {
                     console.error("Ralat mengambil data Firestore:", error);
